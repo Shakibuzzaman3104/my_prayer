@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Fajr",
+    "hour": "4",
+    "min": "02",
+    "status": 1
+  },
+  {
+    "name": "Dhuhr",
+    "hour": "13",
+    "min": "02",
+    "status": 1
+  },
+  {
+    "name": "Asr",
+    "hour": "16",
+    "min": "32",
+    "status": 1
+  },
+  {
+    "name": "Maghrib",
+    "hour": "18",
+    "min": "01",
+    "status": 1
+  },
+  {
+    "name": "Isha",
+    "hour": "19",
+    "min": "49",
+    "status": 1
+  }
+]
