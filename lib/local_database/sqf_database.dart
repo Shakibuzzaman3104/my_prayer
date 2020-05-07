@@ -28,7 +28,7 @@ class DBHelper {
   void _onCreate(Database db, int version) async {
     // When creating the db, create the table
     await db.execute(
-        "CREATE TABLE prayer(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, hour TEXT,min TEXT, status INTEGER)");
+        "CREATE TABLE prayer(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, hour TEXT,min TEXT,ap TEXT, status INTEGER)");
 
     print("Table Created");
 

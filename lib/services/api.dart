@@ -16,6 +16,8 @@ class Api {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
+
+
   Future<List<ModelPrayer>> getPrayers() async {
     Database dbClient = await dbHelper.db;
     final List<Map<String, dynamic>> maps = await dbClient.query(TableNameConstants.PRAYER_TABLE);
@@ -25,8 +27,54 @@ class Api {
         name: maps[i]['name'],
         hour: maps[i]['hour'],
         min: maps[i]['min'],
+        ap: maps[i]['ap'],
         status: maps[i]['status'],
       );
     });
   }
+
+
+  Future updateStatus(int id, int status) async {
+    // get a reference to the database
+    // because this is an expensive operation we use async and await
+    Database db =  await dbHelper.db;
+    // row to update
+    Map<String, dynamic> row = {
+      'status' : status,
+    };
+    // do the update and get the number of affected rows
+    int updateCount = await db.update(
+        TableNameConstants.PRAYER_TABLE,
+        row,
+        where: 'id = ?',
+        whereArgs: [id]);
+
+    // show the results: print all rows in the db
+    print(await db.query(TableNameConstants.PRAYER_TABLE));
+  }
+
+
+  Future updatePrayer(ModelPrayer modelPrayer) async {
+    // get a reference to the database
+    // because this is an expensive operation we use async and await
+    Database db =  await dbHelper.db;
+    // row to update
+    Map<String, dynamic> row = {
+      'name' : modelPrayer.name,
+      'hour' : modelPrayer.hour,
+      'min' : modelPrayer.min,
+      'ap' : modelPrayer.ap,
+      'status' : modelPrayer.status,
+    };
+    // do the update and get the number of affected rows
+    int updateCount = await db.update(
+        TableNameConstants.PRAYER_TABLE,
+        row,
+        where: 'id = ?',
+        whereArgs: [modelPrayer.id]);
+
+    // show the results: print all rows in the db
+    print(await db.query(TableNameConstants.PRAYER_TABLE));
+  }
+
 }

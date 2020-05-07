@@ -1,3 +1,4 @@
+import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -19,6 +20,12 @@ List<SingleChildWidget> dependentServices = [
     update: (context, helper, api) =>
         Api(dbHelper: helper),
   ),
+
+  ProxyProvider<Api, ViewModelPrayers>(
+    update: (context, api, prayer) =>
+        ViewModelPrayers(api: api),
+  ),
+
 ];
 
 /*List<SingleChildWidget> uiConsumableProviders = [

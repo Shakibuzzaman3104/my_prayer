@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:my_prayer/models/model_prayer.dart';
 import 'package:my_prayer/screens/base_widget.dart';
+import 'package:my_prayer/screens/widgets/bottom_widget.dart';
+import 'package:my_prayer/screens/widgets/widget_add_edit.dart';
 import 'package:my_prayer/screens/widgets/widget_prayer_list.dart';
 import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
 
-
-
   @override
   Widget build(BuildContext context) {
     return BaseWidget<ViewModelPrayers>(
-      onValueReady: (model) => model.upcomingPrayer(),
       value: ViewModelPrayers(api: Provider.of(context)),
-      builder: (context, model, child) => Scaffold(
+      onValueReady: (model)=>model.upcomingPrayer(),
+      builder: (ctx,model,child)=>Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
           backgroundColor: Theme.of(context).backgroundColor,
@@ -36,38 +36,37 @@ class HomePage extends StatelessWidget {
                   style: TextStyle(fontSize: 40, color: Colors.white),
                 ),
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: <Widget>[
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    margin: const EdgeInsets.only(top: 8.0, left: 12),
-                    child: Text(
-                      "Time",
-                      style: TextStyle(fontSize: 72, color: Colors.white),
-                    ),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: RichText(
+                  text: TextSpan(
+                    text: "${model.nextPrayer.hour}:${model.nextPrayer.min}",
+                    style: Theme.of(context).textTheme.title,
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: "${model.nextPrayer.ap}",
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ],
                   ),
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    margin: const EdgeInsets.only(top: 8.0, left: 8.0),
-                    child: Text(
-                      "AP",
-                      style: TextStyle(fontSize: 32, color: Colors.white),
-                    ),
-                  ),
-                ],
+                ),
               ),
-              model.busy ? CircularProgressIndicator():WidgetPrayerList(),
+              model.busy
+                  ? CircularProgressIndicator()
+                  : WidgetPrayerList(),
             ],
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton(
           tooltip: 'Add Alarm',
-          child: Icon(Icons.add),
-          backgroundColor: const Color(0xff0A74C5),
-          onPressed: (){},
+          child: WidgetBottomSheet(
+            icon: Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+          ),
+          onPressed: () {},
         ), // This trailing comma makes auto-formatting nicer for build methods.
       ),
     );

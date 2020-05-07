@@ -3,15 +3,30 @@ class ModelPrayer {
   String name;
   String hour;
   String min;
+  String ap;
   int status;
 
-  ModelPrayer({this.id,this.name, this.min,this.hour,this.status});
+  List<ModelPrayer> adjacentNodes;
+
+  ModelPrayer({this.id,this.name, this.ap,this.min,this.hour,this.status});
+
+
+  ModelPrayer.clone(ModelPrayer source) :
+        this.id = source.id,
+        this.name = source.name,
+        this.hour = source.hour,
+        this.min = source.min,
+        this.ap = source.ap,
+        this.status = source.status,
+        this.adjacentNodes = source.adjacentNodes.map((item) => new ModelPrayer.clone(item)).toList();
+
 
   ModelPrayer.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     hour = json['hour'];
     min = json['min'];
+    ap = json['ap'];
     status = json['status'];
   }
 
@@ -21,6 +36,7 @@ class ModelPrayer {
     data['name'] = this.name;
     data['hour'] = this.hour;
     data['min'] = this.min;
+    data['ap'] = this.ap;
     data['status'] = this.status;
     return data;
   }
