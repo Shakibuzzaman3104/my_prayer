@@ -35,6 +35,7 @@ class _BaseWidgetState<T extends ChangeNotifier> extends State<BaseWidget<T>> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<T>(
+      lazy: true,
       create: (_)=> value,
       child: Consumer<T>(
         builder: widget.builder,

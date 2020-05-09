@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:my_prayer/models/model_prayer.dart';
@@ -36,71 +37,75 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
     super.initState();
   }
 
-  _pickTime() async {
-    TimeOfDay t =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
-    if (t != null)
-      setState(() {
-        time = t;
-      });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (ctx, constraints) => IconButton(
-        icon: widget.icon,
-        onPressed: () => showModalBottomSheet(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            backgroundColor: Colors.white,
-            context: context,
-            builder: (_) => BaseWidget<ViewModelPrayers>(
-                  value: ViewModelPrayers(api: Provider.of(context)),
-                  builder: (context, value, child) => Container(
-                    padding: EdgeInsets.all(12),
-                    height: 350,
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          "${widget._modelPrayer == null ? "Add new Prayer" : "Edit Prayer"}",
-                          style: TextStyle(fontSize: 24),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: "Name",
+    print("Rebuilt");
+    return IconButton(
+      icon: widget.icon,
+      onPressed: () => showModalBottomSheet(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+          ),
+          backgroundColor: Colors.white,
+          context: context,
+          builder: (_) => Consumer<ViewModelPrayers>(
+                builder: (context, value, child) => Scaffold(
+                  backgroundColor: Colors.transparent,
+                  body: SingleChildScrollView(
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * .55,
+                      padding: EdgeInsets.all(12),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            "${widget._modelPrayer == null ? "Add prayer" : "Edit prayer"}",
+                            style: TextStyle(
+                                fontSize: 32, fontWeight: FontWeight.w300),
                           ),
-                          controller: _editingController,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                              "Time: ${time.hour > 12 ? time.hour - 12 : time.hour}:${time.minute} ${time.period.toString().split(("."))[1].toUpperCase()}",
-                            ),
-                            FlatButton(
-                              child: Text(
-                                "Pick Time",
-                                style: TextStyle(
-                                    color: Theme.of(context).backgroundColor,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16),
+                          Divider(),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          TextFormField(
+                            style: TextStyle(fontSize: 18,fontWeight: FontWeight.w300),
+                            decoration: InputDecoration(
+                              labelText: "Name",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(6),
+                                borderSide: BorderSide(),
                               ),
-                              onPressed: _pickTime,
                             ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 32,
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: MaterialButton(
+                            controller: _editingController,
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Container(
+                            height: MediaQuery.of(context).size.height*.2,
+                            width: 200,
+                            child: CupertinoDatePicker(
+                              mode: CupertinoDatePickerMode.time,
+                              initialDateTime: DateTime(1969, 1, 1, time.hour, time.minute),
+                              onDateTimeChanged: (DateTime newDateTime) {
+                                time = TimeOfDay.fromDateTime(newDateTime);
+                              },
+                              use24hFormat: false,
+                              minuteInterval: 1,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 32,
+                          ),
+                          MaterialButton(
+                              height: 44,
+                              minWidth: double.infinity,
                               elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: new BorderRadius.circular(6.0)),
                               child: Text(
                                 "${widget._modelPrayer == null ? "Add" : "Save"}",
                                 style: TextStyle(color: Colors.white),
@@ -108,6 +113,7 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
                               color: Theme.of(context).backgroundColor,
                               onPressed: () {
                                 ModelPrayer prayer = ModelPrayer(
+                                  id: widget._modelPrayer.id,
                                     name: _editingController.text,
                                     hour: time.hour.toString(),
                                     min: time.minute.toString(),
@@ -121,13 +127,13 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
                                     : value.updatePrayer(prayer);
 
                                 Navigator.of(context).pop();
-                              }),
-                        )
-                      ],
+                              })
+                        ],
+                      ),
                     ),
                   ),
-                )),
-      ),
+                ),
+              )),
     );
   }
 }

@@ -1,26 +1,52 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_prayer/screens/base_widget.dart';
 import 'package:my_prayer/screens/widgets/bottom_widget.dart';
 import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
 import 'package:provider/provider.dart';
 
-class WidgetPrayerList extends StatelessWidget {
+class WidgetPrayerList extends StatefulWidget {
+  @override
+  _WidgetPrayerListState createState() => _WidgetPrayerListState();
+}
+
+class _WidgetPrayerListState extends State<WidgetPrayerList> {
+  ViewModelPrayers viewModelPrayers;
+
+  @override
+  void initState() {
+    viewModelPrayers = Provider.of<ViewModelPrayers>(context, listen: false);
+    viewModelPrayers.fetchPrayers();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BaseWidget<ViewModelPrayers>(
-      value: ViewModelPrayers(api: Provider.of(context)),
-      onValueReady: (model)=>model.fetchPrayers(),
-      builder: (ctx,model,child)=>Expanded(
-          child: ListView.builder(
+    return Consumer<ViewModelPrayers>(
+      builder: (ctx, model, child) => Expanded(
+        child: ListView.builder(
             key: UniqueKey(),
-              itemBuilder: (con, position) {
-                return Container(
+            itemBuilder: (con, position) {
+              return Dismissible(
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  margin: EdgeInsets.only(top: 8,bottom: 8),
+                  padding: EdgeInsets.only(right: 12),
+                  color: Colors.red,
+                  child: Align(
+                    child: Icon(Icons.delete,color: Colors.white,size: 32,),
+                    alignment: Alignment.centerRight,
+                  ),
+                ),
+                onDismissed: (direction) {
+                    model.deletePrayer(model.prayers[position].id);
+                },
+                child: Container(
                   margin: EdgeInsets.symmetric(vertical: 4),
                   child: Card(
                     child: Padding(
                       padding:
-                      const EdgeInsets.only(left: 16, right: 8, bottom: 6),
+                          const EdgeInsets.only(left: 16, right: 8, bottom: 6),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -33,15 +59,13 @@ class WidgetPrayerList extends StatelessWidget {
                                 child: Text(
                                   "${model.prayers[position].name}",
                                   style: TextStyle(
-                                      fontSize: 24, color: Colors.black87),
+                                      fontSize: 24, color: Colors.black87,fontWeight: FontWeight.w300),
                                 ),
                               ),
                               WidgetBottomSheet(
                                 icon: Icon(
                                   Icons.edit,
-                                  color: Theme
-                                      .of(context)
-                                      .backgroundColor,
+                                  color: Theme.of(context).backgroundColor,
                                 ),
                                 modelPrayer: model.prayers[position],
                               ),
@@ -52,22 +76,14 @@ class WidgetPrayerList extends StatelessWidget {
                             children: <Widget>[
                               RichText(
                                 text: TextSpan(
-                                  style: DefaultTextStyle
-                                      .of(context)
-                                      .style,
+                                  style: DefaultTextStyle.of(context).style,
                                   children: <TextSpan>[
                                     TextSpan(
                                       text:
-                                      "${(int.parse(
-                                          model.prayers[position].hour) > 12
-                                          ? (int.parse(
-                                          model.prayers[position].hour) - 12)
-                                          .toString()
-                                          : model.prayers[position].hour)}:${model
-                                          .prayers[position].min}",
+                                          "${(int.parse(model.prayers[position].hour) > 12 ? (int.parse(model.prayers[position].hour) - 12).toString() : model.prayers[position].hour)}:${model.prayers[position].min}",
                                       style: TextStyle(
                                           fontSize: 36,
-                                          fontWeight: FontWeight.w500),
+                                          fontWeight: FontWeight.w400),
                                     ),
                                     TextSpan(
                                         text: "${model.prayers[position].ap}"),
@@ -79,17 +95,15 @@ class WidgetPrayerList extends StatelessWidget {
                                     ? true
                                     : false,
                                 onChanged: (_) =>
-                                model.prayers[position].status == 0
-                                    ? model.addNotification(
-                                  pos: position,
-                                  id: model.prayers[position].id,
-                                )
-                                    : model.removeNotification(
-                                  model.prayers[position].id,
-                                ),
-                                activeColor: Theme
-                                    .of(context)
-                                    .backgroundColor,
+                                    model.prayers[position].status == 0
+                                        ? model.addNotification(
+                                            pos: position,
+                                            id: model.prayers[position].id,
+                                          )
+                                        : model.removeNotification(
+                                            model.prayers[position].id,
+                                          ),
+                                activeColor: Theme.of(context).backgroundColor,
                               )
                             ],
                           )
@@ -97,10 +111,12 @@ class WidgetPrayerList extends StatelessWidget {
                       ),
                     ),
                   ),
-                );
-              },
-              itemCount: model.prayers == null ? 0 : model.prayers.length)),
+                ),
+                key: Key(model.prayers[position].id.toString()),
+              );
+            },
+            itemCount: model.prayers == null ? 0 : model.prayers.length),
+      ),
     );
-
   }
 }

@@ -17,6 +17,19 @@ class Api {
     );
   }
 
+  Future<void> deletePrayer(int id) async {
+    // Get a reference to the database.
+    Database dbClient = await dbHelper.db;
+    // Remove the Dog from the Database.
+    await dbClient.delete(
+      TableNameConstants.PRAYER_TABLE,
+      // Use a `where` clause to delete a specific dog.
+      where: "id = ?",
+      // Pass the Dog's id as a whereArg to prevent SQL injection.
+      whereArgs: [id],
+    );
+  }
+
 
   Future<List<ModelPrayer>> getPrayers() async {
     Database dbClient = await dbHelper.db;
@@ -73,8 +86,9 @@ class Api {
         where: 'id = ?',
         whereArgs: [modelPrayer.id]);
 
+
     // show the results: print all rows in the db
-    print(await db.query(TableNameConstants.PRAYER_TABLE));
+    print("updated : ${await db.query(TableNameConstants.PRAYER_TABLE)}");
   }
 
 }

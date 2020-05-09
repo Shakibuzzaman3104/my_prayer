@@ -19,16 +19,23 @@ class ViewModelPrayers extends BaseViewModel {
 
   var time = TimeOfDay.fromDateTime(DateTime.now());
   ModelPrayer nextPrayer = ModelPrayer();
-  List<ModelPrayer> prayers;
+  List<ModelPrayer> _prayers;
+
+  List<ModelPrayer> get prayers{
+    return _prayers;
+  }
 
   Future fetchPrayers() async {
-    setBusy(true);
-    this.prayers = await _api.getPrayers();
+   // setBusy(true);
+    this._prayers = await _api.getPrayers();
+
+    print(prayers.length);
+
     setBusy(false);
   }
 
   Future upcomingPrayer() async {
-    setBusy(true);
+    //setBusy(true);
     await _api.getPrayers().then((val) => {nextPrayer = getNext(val)});
 
     if (int.parse(nextPrayer.hour) > 12)
@@ -38,7 +45,7 @@ class ViewModelPrayers extends BaseViewModel {
   }
 
   Future addPrayer(ModelPrayer prayer) async {
-    setBusy(true);
+    //setBusy(true);
     await _api.addPrayer(prayer);
     fetchPrayers();
   }
@@ -60,6 +67,12 @@ class ViewModelPrayers extends BaseViewModel {
 
   Future updateStatus(int id, int status) async {
     await _api.updateStatus(id, status);
+    fetchPrayers();
+  }
+
+  Future deletePrayer(int id) async {
+    removeNotification(id);
+    await _api.deletePrayer(id);
     fetchPrayers();
   }
 
@@ -121,7 +134,6 @@ class ViewModelPrayers extends BaseViewModel {
   Future removeNotification(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
     updateStatus(id, 0);
-    notifyListeners();
   }
 
   @override
