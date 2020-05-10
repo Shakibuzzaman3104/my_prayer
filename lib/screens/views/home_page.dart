@@ -64,6 +64,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).backgroundColor,
         tooltip: 'Add Alarm',
         child: WidgetBottomSheet(
           icon: Icon(

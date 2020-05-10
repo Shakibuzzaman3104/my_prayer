@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           fontFamily: 'Quicksand',
-          backgroundColor: const Color(0xff0A74C5),
+          backgroundColor: const Color(0xff4844FF),
           textTheme: Theme.of(context).textTheme.copyWith(
             title: TextStyle(fontSize: 80,fontWeight: FontWeight.w300,color: Colors.white),
           )

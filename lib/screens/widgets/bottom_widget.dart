@@ -40,7 +40,6 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    print("Rebuilt");
     return IconButton(
       icon: widget.icon,
       onPressed: () => showModalBottomSheet(
@@ -113,10 +112,10 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
                               color: Theme.of(context).backgroundColor,
                               onPressed: () {
                                 ModelPrayer prayer = ModelPrayer(
-                                  id: widget._modelPrayer.id,
+                                    id: widget._modelPrayer!=null ? widget._modelPrayer.id : null,
                                     name: _editingController.text,
                                     hour: time.hour.toString(),
-                                    min: time.minute.toString(),
+                                    min: time.minute<10? "0"+time.minute.toString() : time.minute.toString(),
                                     status: 0,
                                     ap: time.period
                                         .toString()
