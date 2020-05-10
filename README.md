@@ -1,8 +1,8 @@
-# my_prayer
+# My Prayer
 
 Is a flutter application for prayer reminder.
 
-Used:
+# Used:
 
 Provider
 Dependency injection
