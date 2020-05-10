@@ -4,9 +4,21 @@ Is a flutter application for prayer reminder.
 
 # Used:
 
-Provider
-Dependency injection
-Local notification
-sqflite database
-Pre-populate sqflite
+<html>
+
+<body>
+
+  <ul>
+    <li>
+  Provider</li>
+ <li> Dependency injection</li>
+  <li>Local notification</li>
+  <li>sqflite database</li>
+ <li> Pre-populate sqflite</li>
+  
+</ul>
+
+</body>
+
+</html>
 
