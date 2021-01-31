@@ -1,17 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:my_prayer/models/model_prayer.dart';
-import 'package:my_prayer/screens/base_widget.dart';
+import 'package:my_prayer/localization/Localization.dart';
+import 'package:my_prayer/model/LocalPrayer.dart';
+import 'package:my_prayer/utils/language_constants.dart';
 import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
 import 'package:provider/provider.dart';
 
 class WidgetBottomSheet extends StatefulWidget {
-  final ModelPrayer _modelPrayer;
+  final LocalPrayer _localPrayer;
   final Icon icon;
+  final int pos;
+  final GlobalKey<ScaffoldState> globalKey;
 
-  WidgetBottomSheet({ModelPrayer modelPrayer, @required this.icon})
-      : _modelPrayer = modelPrayer;
+  WidgetBottomSheet(
+      {LocalPrayer modelPrayer, @required this.icon, this.globalKey,this.pos})
+      : _localPrayer = modelPrayer;
 
   @override
   _WidgetBottomSheetState createState() => _WidgetBottomSheetState();
@@ -25,18 +28,17 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
   @override
   void initState() {
     time = TimeOfDay(
-        hour: widget._modelPrayer == null
+        hour: widget._localPrayer == null
             ? TimeOfDay.now().hour
-            : int.parse(widget._modelPrayer.hour),
-        minute: widget._modelPrayer == null
+            : int.parse(widget._localPrayer.hour),
+        minute: widget._localPrayer == null
             ? TimeOfDay.now().minute
-            : int.parse(widget._modelPrayer.min));
+            : int.parse(widget._localPrayer.min));
 
     _editingController = TextEditingController(
-        text: "${widget._modelPrayer == null ? "" : widget._modelPrayer.name}");
+        text: "${widget._localPrayer == null ? "" : widget._localPrayer.name}");
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +63,7 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            "${widget._modelPrayer == null ? "Add prayer" : "Edit prayer"}",
+                            "${widget._localPrayer == null ?  Localization.of(context).translate(LanguageConstant.ADD_PRAYER) : Localization.of(context).translate(LanguageConstant.EDIT_PRAYER)}",
                             style: TextStyle(
                                 fontSize: 32, fontWeight: FontWeight.w300),
                           ),
@@ -70,9 +72,10 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
                             height: 8,
                           ),
                           TextFormField(
-                            style: TextStyle(fontSize: 18,fontWeight: FontWeight.w300),
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w300),
                             decoration: InputDecoration(
-                              labelText: "Name",
+                              labelText: "${Localization.of(context).translate(LanguageConstant.NAME)}",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6),
                                 borderSide: BorderSide(),
@@ -84,11 +87,12 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
                             height: 8,
                           ),
                           Container(
-                            height: MediaQuery.of(context).size.height*.2,
+                            height: MediaQuery.of(context).size.height * .2,
                             width: 200,
                             child: CupertinoDatePicker(
                               mode: CupertinoDatePickerMode.time,
-                              initialDateTime: DateTime(1969, 1, 1, time.hour, time.minute),
+                              initialDateTime:
+                                  DateTime(1969, 1, 1, time.hour, time.minute),
                               onDateTimeChanged: (DateTime newDateTime) {
                                 time = TimeOfDay.fromDateTime(newDateTime);
                               },
@@ -106,25 +110,41 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: new BorderRadius.circular(6.0)),
                               child: Text(
-                                "${widget._modelPrayer == null ? "Add" : "Save"}",
+                                "${widget._localPrayer == null ? Localization.of(context).translate(LanguageConstant.ADD) : Localization.of(context).translate(LanguageConstant.SAVE)}",
                                 style: TextStyle(color: Colors.white),
                               ),
                               color: Theme.of(context).backgroundColor,
                               onPressed: () {
-                                ModelPrayer prayer = ModelPrayer(
-                                    id: widget._modelPrayer!=null ? widget._modelPrayer.id : null,
+                                LocalPrayer prayer = LocalPrayer(
+                                    id: widget._localPrayer != null
+                                        ? widget._localPrayer.id
+                                        : null,
                                     name: _editingController.text,
                                     hour: time.hour.toString(),
-                                    min: time.minute<10? "0"+time.minute.toString() : time.minute.toString(),
+                                    min: time.minute < 10
+                                        ? "0" + time.minute.toString()
+                                        : time.minute.toString(),
                                     status: 0,
                                     ap: time.period
                                         .toString()
                                         .split(("."))[1]
                                         .toUpperCase());
-                                widget._modelPrayer == null
-                                    ? value.addPrayer(prayer)
-                                    : value.updatePrayer(prayer);
-
+                                widget._localPrayer == null
+                                    ? value.addPrayer(prayer).then((value) {
+                                        widget.globalKey.currentState
+                                            .showSnackBar(SnackBar(
+                                                duration: Duration(milliseconds: 800),
+                                                content:
+                                                    Text("New Prayer added")));
+                                      })
+                                    : value.updatePrayer(prayer,widget.pos).then((value) {
+                                        widget.globalKey.currentState
+                                            .showSnackBar(SnackBar(
+                                              duration: Duration(milliseconds: 800),
+                                                content:
+                                                    Text("Prayer updated")));
+                                      });
+                                  _editingController.clear();
                                 Navigator.of(context).pop();
                               })
                         ],

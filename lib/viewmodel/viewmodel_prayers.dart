@@ -1,69 +1,90 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:my_prayer/models/model_prayer.dart';
-import 'package:my_prayer/services/api.dart';
+import 'package:my_prayer/api/api.dart';
+import 'package:my_prayer/model/LocalPrayer.dart';
+
 import 'package:my_prayer/viewmodel/base_view_model.dart';
 
 class ViewModelPrayers extends BaseViewModel {
   Api _api;
+  bool isOnline = false;
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   BuildContext context;
 
-
-  ViewModelPrayers({this.context, @required Api api}) {
-    initNotification();
-    this._api = api;
+  void connectionChanged(dynamic hasConnection) {
+    print("Connection Changed");
+    if (!isOnline) {}
+    isOnline = !isOnline;
   }
 
-  var time = TimeOfDay.fromDateTime(DateTime.now());
-  ModelPrayer nextPrayer = ModelPrayer();
-  List<ModelPrayer> _prayers;
+  ViewModelPrayers({this.context}) {
+    initNotification();
+    this._api = Api();
+    _prayers = List();
+  }
 
-  List<ModelPrayer> get prayers{
+  var time;
+  LocalPrayer nextPrayer = LocalPrayer();
+  List<LocalPrayer> _prayers;
+
+  List<LocalPrayer> get prayers {
     return _prayers;
   }
 
   Future fetchPrayers() async {
-   // setBusy(true);
-    this._prayers = await _api.getPrayers();
+    await checkConnectionStatus().then((value) {
+      _api.getPrayersFromServer().then((response) {
+        if (response is DioError) {
+          return response;
+        } else if (response == null) {
+          print("Already updated");
+        } else {
 
-    print(prayers.length);
+        }
+      });
+    });
+    await upcomingPrayer();
 
     setBusy(false);
   }
 
   Future upcomingPrayer() async {
-    //setBusy(true);
-    await _api.getPrayers().then((val) => {nextPrayer = getNext(val)});
-
-    if (int.parse(nextPrayer.hour) > 12)
+    time = TimeOfDay.fromDateTime(DateTime.now());
+    if (nextPrayer.hour != null) if (int.parse(nextPrayer.hour) > 12)
       nextPrayer.hour = (int.parse(nextPrayer.hour) - 12).toString();
 
     setBusy(false);
   }
 
-  Future addPrayer(ModelPrayer prayer) async {
+  Future addPrayer(LocalPrayer prayer) async {
     //setBusy(true);
-    await _api.addPrayer(prayer);
-    fetchPrayers();
+    var res = await _api.addPrayer(prayer);
+    await fetchPrayers();
+    return res;
   }
 
-  ModelPrayer getNext(List<ModelPrayer> val) {
+  LocalPrayer getNext(List<LocalPrayer> val) {
     double currentTimeParse = double.parse("${time.hour}.${time.minute}");
-    double lastPrayerTime =
-        double.parse("${val[val.length - 1].hour}.${val[val.length - 1].min}");
 
-    print(lastPrayerTime);
-    return currentTimeParse > lastPrayerTime
-        ? val[0]
-        : val.firstWhere((res) {
-            double times = double.parse("${res.hour}.${res.min}");
-            return currentTimeParse < times;
-          });
+    double finalTime = 23.59;
+    LocalPrayer prayer = LocalPrayer();
+    for (var res in val) {
+      print("Times: ${res.min}");
+      double times = double.parse("${res.hour}.${res.min}");
+      if (currentTimeParse < times) {
+        if (finalTime > times) {
+          finalTime = times;
+
+          prayer = res;
+        }
+      }
+    }
+
+    return prayer;
   }
-
 
   Future updateStatus(int id, int status) async {
     await _api.updateStatus(id, status);
@@ -76,8 +97,10 @@ class ViewModelPrayers extends BaseViewModel {
     fetchPrayers();
   }
 
-  Future updatePrayer(ModelPrayer modelPrayer) async {
+  Future updatePrayer(LocalPrayer modelPrayer, int pos) async {
     await _api.updatePrayer(modelPrayer);
+    // await removeNotification(modelPrayer.id);
+    // addNotification(pos: pos, id: modelPrayer.id);
     fetchPrayers();
   }
 
@@ -108,7 +131,7 @@ class ViewModelPrayers extends BaseViewModel {
     );
   }
 
-  void addNotification({int pos, int id}) async {
+  Future addNotification({int pos, int id}) async {
     print(int.parse(prayers[pos].hour));
 
     var time =

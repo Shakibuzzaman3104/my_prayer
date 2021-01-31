@@ -1,4 +1,4 @@
-class ModelPrayer {
+class LocalPrayer {
   int id;
   String name;
   String hour;
@@ -6,22 +6,22 @@ class ModelPrayer {
   String ap;
   int status;
 
-  List<ModelPrayer> adjacentNodes;
+  List<LocalPrayer> adjacentNodes;
 
-  ModelPrayer({this.id,this.name, this.ap,this.min,this.hour,this.status});
+  LocalPrayer({this.id,this.name, this.ap,this.min,this.hour,this.status});
 
 
-  ModelPrayer.clone(ModelPrayer source) :
+  LocalPrayer.clone(LocalPrayer source) :
         this.id = source.id,
         this.name = source.name,
         this.hour = source.hour,
         this.min = source.min,
         this.ap = source.ap,
         this.status = source.status,
-        this.adjacentNodes = source.adjacentNodes.map((item) => new ModelPrayer.clone(item)).toList();
+        this.adjacentNodes = source.adjacentNodes.map((item) => new LocalPrayer.clone(item)).toList();
 
 
-  ModelPrayer.fromJson(Map<String, dynamic> json) {
+  LocalPrayer.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     hour = json['hour'];

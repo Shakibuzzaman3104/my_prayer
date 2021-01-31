@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:my_prayer/models/model_prayer.dart';
+import 'package:my_prayer/model/LocalPrayer.dart';
 
 class WidgetAddEdit extends StatefulWidget {
 
-  final ModelPrayer modelPrayer;
-  WidgetAddEdit(this.modelPrayer);
+  final LocalPrayer localPrayer;
+  WidgetAddEdit(this.localPrayer);
 
   @override
   _WidgetAddEditState createState() => _WidgetAddEditState();

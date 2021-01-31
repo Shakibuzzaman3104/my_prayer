@@ -2,8 +2,10 @@ import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
-import 'local_database/sqf_database.dart';
-import 'services/api.dart';
+import 'api/api.dart';
+
+
+import 'viewmodel/language_provider.dart';
 
 
 List<SingleChildWidget> providers = [
@@ -12,19 +14,16 @@ List<SingleChildWidget> providers = [
 ];
 
 List<SingleChildWidget> independentServices = [
-  Provider.value(value: DBHelper())
+  ChangeNotifierProvider<LanguageProvider>(create: (_) => LanguageProvider()),
+  ChangeNotifierProvider<ViewModelPrayers>(create: (_) => ViewModelPrayers()),
 ];
 
 List<SingleChildWidget> dependentServices = [
-  ProxyProvider<DBHelper, Api>(
-    update: (context, helper, api) =>
-        Api(dbHelper: helper),
-  ),
 
-  ProxyProvider<Api, ViewModelPrayers>(
+  /*ProxyProvider<Api, ViewModelPrayers>(
     update: (context, api, prayer) =>
         ViewModelPrayers(api: api),
-  ),
+  ),*/
 
 ];
 

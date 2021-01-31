@@ -1,36 +1,36 @@
 [
   {
     "name": "Fajr",
-    "hour": "4",
-    "min": "02",
+    "hour": "5",
+    "min": "23",
     "ap": "AM",
     "status": 0
   },
   {
     "name": "Dhuhr",
-    "hour": "13",
-    "min": "02",
+    "hour": "12",
+    "min": "11",
     "ap": "PM",
     "status": 0
   },
   {
     "name": "Asr",
     "hour": "16",
-    "min": "32",
+    "min": "05",
     "ap": "PM",
     "status": 0
   },
   {
     "name": "Maghrib",
-    "hour": "18",
-    "min": "32",
+    "hour": "17",
+    "min": "41",
     "ap": "PM",
     "status": 0
   },
   {
     "name": "Isha",
-    "hour": "19",
-    "min": "49",
+    "hour": "18",
+    "min": "59",
     "ap": "PM",
     "status": 0
   }
