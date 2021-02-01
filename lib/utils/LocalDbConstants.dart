@@ -27,4 +27,8 @@ class LocalDbConstants{
 
   static String PRAYER="prayer";
 
+  static String LOCAL_PRAYER="local_prayer";
+
+  static String LOCAL_PRAYER_PARENT="local_parent";
+
 }

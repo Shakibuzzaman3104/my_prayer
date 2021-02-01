@@ -18,9 +18,6 @@ class SizeConfig {
       _screenWidth = constraints.maxWidth;
       _screenHeight = constraints.maxHeight;
 
-      print("Height: $_screenHeight");
-      print("width: $_screenWidth");
-
       isPortrait = true;
       if (_screenWidth < 10) {
         isMobilePortrait = true;

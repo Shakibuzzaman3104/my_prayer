@@ -3,7 +3,7 @@ import 'package:my_prayer/model/LocalPrayer.dart';
 
 class WidgetAddEdit extends StatefulWidget {
 
-  final LocalPrayer localPrayer;
+  final ModelLocalPrayer localPrayer;
   WidgetAddEdit(this.localPrayer);
 
   @override

@@ -2,14 +2,19 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:my_prayer/api/api.dart';
+
 import 'package:my_prayer/model/LocalPrayer.dart';
+import 'package:my_prayer/model/ModelLocalPrayerParent.dart';
+import 'package:my_prayer/model/ModelPrayer.dart';
+import 'package:my_prayer/repository/repository.dart';
+import 'package:my_prayer/server_setup/local_database.dart';
 
 import 'package:my_prayer/viewmodel/base_view_model.dart';
 
 class ViewModelPrayers extends BaseViewModel {
-  Api _api;
+  PrayerRepository _repository;
   bool isOnline = false;
+  ModelLocalPrayerParent _parentPrayer;
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   BuildContext context;
@@ -22,83 +27,94 @@ class ViewModelPrayers extends BaseViewModel {
 
   ViewModelPrayers({this.context}) {
     initNotification();
-    this._api = Api();
-    _prayers = List();
+    this._repository = PrayerRepository();
+    _prayers = ModelPrayer();
+    _parentPrayer = ModelLocalPrayerParent();
   }
 
   var time;
-  LocalPrayer nextPrayer = LocalPrayer();
-  List<LocalPrayer> _prayers;
+  ModelLocalPrayer nextPrayer = ModelLocalPrayer();
+  ModelPrayer _prayers;
 
-  List<LocalPrayer> get prayers {
-    return _prayers;
+  ModelPrayer get prayers => _prayers;
+
+  ModelLocalPrayerParent get parentPrayer => _parentPrayer;
+
+  fetchPrayers() async {
+    await checkConnectionStatus().then((value) async {
+      await _repository
+          .getPrayersFromServer()
+          .then((response) {
+            if (response is DioError) {
+              print(response.message);
+              _prayers.hasError = true;
+              _prayers.status = response.message;
+            } else if (response == null) {
+              print("Already updated");
+            }
+          })
+          .catchError((error) async =>
+              {_prayers.status = error.toString(), _prayers.hasError = true})
+          .catchError((e) {});
+    });
+    //await upcomingPrayer();
+    getDataFromDB();
   }
 
-  Future fetchPrayers() async {
-    await checkConnectionStatus().then((value) {
-      _api.getPrayersFromServer().then((response) {
-        if (response is DioError) {
-          return response;
-        } else if (response == null) {
-          print("Already updated");
-        } else {
+  getDataFromDB() async {
+    await HiveDb.getInstance().openPrayerBox();
+    await HiveDb.getInstance().openLocalPrayerParentBox();
+    await HiveDb.getInstance().openLocalPrayerBox();
+    if (HiveDb.getInstance().prayerBox.isNotEmpty) {
+      _prayers = HiveDb.getInstance().prayerBox.get(0);
+    }
+    if (HiveDb.getInstance().localPrayerParentBox.isNotEmpty) {
+      _parentPrayer = HiveDb.getInstance().localPrayerParentBox.values.last;
+      debugPrint(
+          "ViewModel ${_parentPrayer.prayers.length}");
+      /**/
 
-        }
-      });
-    });
-    await upcomingPrayer();
+    } else
+      debugPrint("Not Found");
+
+    HiveDb.getInstance().prayerBox.close();
+    HiveDb.getInstance().localPrayerParentBox.close();
 
     setBusy(false);
   }
 
   Future upcomingPrayer() async {
     time = TimeOfDay.fromDateTime(DateTime.now());
-    if (nextPrayer.hour != null) if (int.parse(nextPrayer.hour) > 12)
-      nextPrayer.hour = (int.parse(nextPrayer.hour) - 12).toString();
 
     setBusy(false);
   }
 
-  Future addPrayer(LocalPrayer prayer) async {
+  DateTime getCurrentDate() {}
+
+  Future addPrayer(ModelLocalPrayer prayer) async {
     //setBusy(true);
-    var res = await _api.addPrayer(prayer);
+    var res = await _repository.addPrayer(prayer);
     await fetchPrayers();
     return res;
   }
 
-  LocalPrayer getNext(List<LocalPrayer> val) {
-    double currentTimeParse = double.parse("${time.hour}.${time.minute}");
-
-    double finalTime = 23.59;
-    LocalPrayer prayer = LocalPrayer();
-    for (var res in val) {
-      print("Times: ${res.min}");
-      double times = double.parse("${res.hour}.${res.min}");
-      if (currentTimeParse < times) {
-        if (finalTime > times) {
-          finalTime = times;
-
-          prayer = res;
-        }
-      }
-    }
-
-    return prayer;
+  ModelLocalPrayer getNext(List<ModelLocalPrayer> val) {
+    return ModelLocalPrayer();
   }
 
   Future updateStatus(int id, int status) async {
-    await _api.updateStatus(id, status);
+    await _repository.updateStatus(id, status);
     fetchPrayers();
   }
 
   Future deletePrayer(int id) async {
     removeNotification(id);
-    await _api.deletePrayer(id);
+    await _repository.deletePrayer(id);
     fetchPrayers();
   }
 
-  Future updatePrayer(LocalPrayer modelPrayer, int pos) async {
-    await _api.updatePrayer(modelPrayer);
+  Future updatePrayer(ModelLocalPrayer modelPrayer, int pos) async {
+    await _repository.updatePrayer(modelPrayer);
     // await removeNotification(modelPrayer.id);
     // addNotification(pos: pos, id: modelPrayer.id);
     fetchPrayers();
@@ -131,7 +147,7 @@ class ViewModelPrayers extends BaseViewModel {
     );
   }
 
-  Future addNotification({int pos, int id}) async {
+/*  Future addNotification({int pos, int id}) async {
     print(int.parse(prayers[pos].hour));
 
     var time =
@@ -152,7 +168,7 @@ class ViewModelPrayers extends BaseViewModel {
         platformChannelSpecifics);
 
     updateStatus(id, 1);
-  }
+  }*/
 
   Future removeNotification(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);

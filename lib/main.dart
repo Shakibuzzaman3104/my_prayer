@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:my_prayer/local_database/sharedpreferences.dart';
@@ -7,9 +8,7 @@ import 'package:my_prayer/localization/Localization.dart';
 import 'package:my_prayer/provider_setup.dart';
 import 'package:my_prayer/responsive/sizeconfig.dart';
 import 'package:my_prayer/screens/views/home.dart';
-import 'package:my_prayer/screens/views/home_page.dart';
 import 'package:my_prayer/server_setup/local_database.dart';
-import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -17,12 +16,12 @@ import 'viewmodel/language_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MySharedPreferences.getInstance();
+  var instance = MySharedPreferences.getInstance();
+  await instance.createPref();
   await Hive.initFlutter();
   HiveDb.getInstance().init();
   LanguageProvider languageProvider = LanguageProvider();
   await languageProvider.fetchLocale();
-  Provider.debugCheckInvalidValueType = null;
   runApp(
     MultiProvider(
       child: new MyApp(languageProvider: languageProvider),
@@ -62,15 +61,24 @@ class MyApp extends StatelessWidget {
                 ],
                 debugShowCheckedModeBanner: false,
                 theme: ThemeData(
-                    fontFamily: 'Quicksand',
-                    backgroundColor: Colors.indigo,
-                    textTheme: Theme.of(context).textTheme.copyWith(
-                          title: TextStyle(
-                              fontSize: 80,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.white),
-                        )),
-                home: HomePage(),
+                  fontFamily: "Barlow",
+                  backgroundColor: Colors.indigo,
+                  textTheme: Theme.of(context).textTheme.copyWith(
+                        headline6: TextStyle(
+                            fontSize: 80,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.white),
+                      ),
+                ),
+                home: AnnotatedRegion<SystemUiOverlayStyle>(
+                    value: SystemUiOverlayStyle(
+                      statusBarColor: Colors.transparent, // transparent status bar
+                      systemNavigationBarColor: Colors.black, // navigation bar color
+                      statusBarIconBrightness: Brightness.dark, // status bar icons' color
+                      systemNavigationBarIconBrightness: Brightness.dark, //navigation bar icons' color
+                    ),
+                 child: HomeView(),
+                ),
               );
             },
           ),

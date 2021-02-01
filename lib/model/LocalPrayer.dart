@@ -1,32 +1,37 @@
-class LocalPrayer {
+import 'package:hive/hive.dart';
+
+part 'LocalPrayer.g.dart';
+
+@HiveType(typeId: 18, adapterName: 'LocalPrayerAdapter')
+class ModelLocalPrayer extends HiveObject{
+  @HiveField(0)
   int id;
+  @HiveField(1)
   String name;
-  String hour;
-  String min;
-  String ap;
+  @HiveField(2)
+  String time;
+  @HiveField(3)
   int status;
 
-  List<LocalPrayer> adjacentNodes;
+ // List<UpComingPrayer> adjacentNodes;
 
-  LocalPrayer({this.id,this.name, this.ap,this.min,this.hour,this.status});
+  ModelLocalPrayer({this.id,this.name,  this.time,this.status=0});
 
-
-  LocalPrayer.clone(LocalPrayer source) :
+/*
+  UpComingPrayer.clone(UpComingPrayer source) :
         this.id = source.id,
         this.name = source.name,
         this.hour = source.hour,
         this.min = source.min,
         this.ap = source.ap,
         this.status = source.status,
-        this.adjacentNodes = source.adjacentNodes.map((item) => new LocalPrayer.clone(item)).toList();
+        this.adjacentNodes = source.adjacentNodes.map((item) => new UpComingPrayer.clone(item)).toList();*/
 
 
-  LocalPrayer.fromJson(Map<String, dynamic> json) {
+  ModelLocalPrayer.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    hour = json['hour'];
-    min = json['min'];
-    ap = json['ap'];
+    time = json['time'];
     status = json['status'];
   }
 
@@ -34,9 +39,7 @@ class LocalPrayer {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['name'] = this.name;
-    data['hour'] = this.hour;
-    data['min'] = this.min;
-    data['ap'] = this.ap;
+    data['time'] = this.time;
     data['status'] = this.status;
     return data;
   }

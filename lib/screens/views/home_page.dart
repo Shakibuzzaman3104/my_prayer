@@ -3,7 +3,6 @@ import 'package:my_prayer/localization/Localization.dart';
 
 import 'package:my_prayer/screens/widgets/bottom_widget.dart';
 import 'package:my_prayer/screens/widgets/settings_toogle.dart';
-import 'package:my_prayer/screens/widgets/widget_prayer_list.dart';
 import 'package:my_prayer/utils/en_to_bd_number.dart';
 import 'package:my_prayer/utils/language_constants.dart';
 import 'package:my_prayer/viewmodel/language_provider.dart';
@@ -50,7 +49,7 @@ class _HomePageState extends State<HomePage> {
                       alignment: Alignment.centerLeft,
                       margin: EdgeInsets.only(top: size, left: 16),
                       child: Text(
-                        "${model.nextPrayer.hour == null ? Localization.of(context).translate(LanguageConstant.ALAS) :  Localization.of(context).translate(model.nextPrayer.name)==null? model.nextPrayer.name : Localization.of(context).translate(model.nextPrayer.name)}",
+                        "",
                         style: TextStyle(
                             fontSize: size,
                             color: Colors.white,
@@ -79,7 +78,7 @@ class _HomePageState extends State<HomePage> {
                   child: RichText(
                     text: TextSpan(
                       text:
-                          "${model.nextPrayer.hour == null ? "" : " ${ data.appLocal == Locale("bn") ? replaceEnglishNumber(model.nextPrayer.hour): model.nextPrayer.hour}:${ data.appLocal == Locale("bn") ? replaceEnglishNumber(model.nextPrayer.min): model.nextPrayer.min}"}",
+                          "",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: size + 36,
@@ -87,7 +86,7 @@ class _HomePageState extends State<HomePage> {
                       children: <TextSpan>[
                         TextSpan(
                           text:
-                              "${model.nextPrayer.hour == null ? '${Localization.of(context).translate(LanguageConstant.NO_UPCOMING)}' : model.nextPrayer.ap}",
+                              "",
                           style: TextStyle(fontSize: size - 16),
                         ),
                       ],
@@ -96,21 +95,21 @@ class _HomePageState extends State<HomePage> {
                 ),
                 model.busy
                     ? CircularProgressIndicator()
-                    : model.prayers.length == 0
+                    : model.prayers.hasError
                         ? Expanded(
                             child: Center(
                               child: Text(
-                                "${Localization.of(context).translate(LanguageConstant.NO_PRAYER)}",
+                                "${model.prayers.status}",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize: size + 10, color: Colors.white,),
                               ),
                             ),
                           )
-                        : WidgetPrayerList(
+                        : Container()/*WidgetPrayerList(
                             provider: data,
                             globalKey: _scaffoldKey,
-                          ),
+                          ),*/
               ],
             ),
           ),

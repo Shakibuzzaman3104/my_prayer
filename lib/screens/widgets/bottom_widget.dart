@@ -7,13 +7,13 @@ import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
 import 'package:provider/provider.dart';
 
 class WidgetBottomSheet extends StatefulWidget {
-  final LocalPrayer _localPrayer;
+  final ModelLocalPrayer _localPrayer;
   final Icon icon;
   final int pos;
   final GlobalKey<ScaffoldState> globalKey;
 
   WidgetBottomSheet(
-      {LocalPrayer modelPrayer, @required this.icon, this.globalKey,this.pos})
+      {ModelLocalPrayer modelPrayer, @required this.icon, this.globalKey,this.pos})
       : _localPrayer = modelPrayer;
 
   @override
@@ -27,13 +27,7 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
 
   @override
   void initState() {
-    time = TimeOfDay(
-        hour: widget._localPrayer == null
-            ? TimeOfDay.now().hour
-            : int.parse(widget._localPrayer.hour),
-        minute: widget._localPrayer == null
-            ? TimeOfDay.now().minute
-            : int.parse(widget._localPrayer.min));
+
 
     _editingController = TextEditingController(
         text: "${widget._localPrayer == null ? "" : widget._localPrayer.name}");
@@ -115,20 +109,14 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
                               ),
                               color: Theme.of(context).backgroundColor,
                               onPressed: () {
-                                LocalPrayer prayer = LocalPrayer(
+                                ModelLocalPrayer prayer = ModelLocalPrayer(
                                     id: widget._localPrayer != null
                                         ? widget._localPrayer.id
                                         : null,
                                     name: _editingController.text,
-                                    hour: time.hour.toString(),
-                                    min: time.minute < 10
-                                        ? "0" + time.minute.toString()
-                                        : time.minute.toString(),
+
                                     status: 0,
-                                    ap: time.period
-                                        .toString()
-                                        .split(("."))[1]
-                                        .toUpperCase());
+                                    );
                                 widget._localPrayer == null
                                     ? value.addPrayer(prayer).then((value) {
                                         widget.globalKey.currentState

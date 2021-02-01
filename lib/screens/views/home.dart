@@ -1,5 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:my_prayer/screens/widgets/home/sliver.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:my_prayer/responsive/sizeconfig.dart';
+import 'package:my_prayer/screens/views/navigation.dart';
+import 'package:my_prayer/screens/views/reminders.dart';
+import 'package:my_prayer/screens/views/settings.dart';
+import 'package:my_prayer/screens/views/dashboard.dart';
+import 'package:my_prayer/server_setup/api_client.dart';
+import 'package:my_prayer/utils/color_constants.dart';
+import 'package:my_prayer/utils/router_path_constants.dart';
+import 'package:my_prayer/viewmodel/viewmodel_home.dart';
+import 'package:provider/provider.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -7,15 +17,88 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  static List _widgetOptions = [
+    Dashboard(),
+    Navigation(),
+    Reminders(),
+    Settings(),
+  ];
+
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.blueAccent,
-        body: Container(
-          child: CustomSliver(),
+    return Consumer<ViewModelHome>(builder: (context, home, child) {
+      return Container(
+        decoration: BoxDecoration(color: ColorConstants.BACKGROUND
+            /* gradient: LinearGradient(
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  colors: [Color(0xFFFFFFFF), Color(0xFFFFFFFF)]),*/
+            ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: _widgetOptions[home.position],
+          bottomNavigationBar: BottomNavigationBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            items: [
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  "assets/img/home.svg",
+                  height: SizeConfig.imageSizeMultiplier * 6,
+                  width: SizeConfig.imageSizeMultiplier * 6,
+                  color: ColorConstants.ICON,
+                ),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  "assets/img/compass.svg",
+                  height: SizeConfig.imageSizeMultiplier * 6,
+                  width: SizeConfig.imageSizeMultiplier * 6,
+                  color: ColorConstants.ICON,
+                ),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  "assets/img/reminder.svg",
+                  height: SizeConfig.imageSizeMultiplier * 6,
+                  width: SizeConfig.imageSizeMultiplier * 6,
+                  color: ColorConstants.ICON,
+                ),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  "assets/img/settings.svg",
+                  height: SizeConfig.imageSizeMultiplier * 6,
+                  width: SizeConfig.imageSizeMultiplier * 6,
+                  color: ColorConstants.ICON,
+                ),
+                label: 'Home',
+              ),
+            ],
+            currentIndex: home.position,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white.withAlpha(100),
+            type: BottomNavigationBarType.fixed,
+            onTap: (index) {
+              if (index > -1 && index < 3) {
+                home.setPosition(index);
+              } else
+                Navigator.of(context).pushNamed(RouterPathsConstants.SETTINGS);
+              // try {
+
+              // } on Exception catch (_) {
+              //   print('never reached');
+              // }
+            },
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

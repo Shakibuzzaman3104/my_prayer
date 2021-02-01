@@ -30,11 +30,17 @@ class _WidgetPrayerListState extends State<WidgetPrayerList> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+
+ /* @override
+  Widget build(BuildContext context) {
     return Consumer<ViewModelPrayers>(
       builder: (ctx, model, child) => Expanded(
         child: ListView.builder(
             key: UniqueKey(),
-            padding:EdgeInsets.only(top: 8, bottom: 8,left: 16,right: 16),
+            padding: EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
             itemBuilder: (con, position) {
               return Dismissible(
                 direction: DismissDirection.endToStart,
@@ -69,7 +75,7 @@ class _WidgetPrayerListState extends State<WidgetPrayerList> {
                                 alignment: Alignment.centerLeft,
                                 margin: EdgeInsets.only(top: 8),
                                 child: Text(
-                                  "${ Localization.of(context).translate(model.prayers[position].name)==null? model.prayers[position].name : Localization.of(context).translate(model.prayers[position].name)}",
+                                  "${Localization.of(context).translate(model.prayers[position].name) == null ? model.prayers[position].name : Localization.of(context).translate(model.prayers[position].name)}",
                                   style: TextStyle(
                                       fontSize: 24,
                                       color: Colors.black87,
@@ -155,5 +161,5 @@ class _WidgetPrayerListState extends State<WidgetPrayerList> {
             itemCount: model.prayers == null ? 0 : model.prayers.length),
       ),
     );
-  }
+  }*/
 }

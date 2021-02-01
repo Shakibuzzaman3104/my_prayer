@@ -8,8 +8,10 @@ import 'package:my_prayer/model/GregorianWeekday.dart';
 import 'package:my_prayer/model/Hijri.dart';
 import 'package:my_prayer/model/HijriMonth.dart';
 import 'package:my_prayer/model/HijriWeekday.dart';
+import 'package:my_prayer/model/LocalPrayer.dart';
 import 'package:my_prayer/model/Meta.dart';
 import 'package:my_prayer/model/Method.dart';
+import 'package:my_prayer/model/ModelLocalPrayerParent.dart';
 import 'package:my_prayer/model/ModelPrayer.dart';
 import 'package:my_prayer/model/Params.dart';
 import 'package:my_prayer/model/Timings.dart';
@@ -27,6 +29,8 @@ class HiveDb {
   }
 
   Box<ModelPrayer> prayerBox;
+  Box<ModelLocalPrayer> localPrayerBox;
+  Box<ModelLocalPrayerParent> localPrayerParentBox;
   Box<Datum> datumBox;
   Box<Timings> timingsBox;
   Box<Date> dateBox;
@@ -59,6 +63,8 @@ class HiveDb {
       ..registerAdapter(MetaAdapter())
       ..registerAdapter(MethodAdapter())
       ..registerAdapter(ParamsAdapter())
+      ..registerAdapter(LocalPrayerAdapter())
+      ..registerAdapter(ModelLocalPrayerParentAdapter())
       ..registerAdapter(TimingsAdapter());
   }
 
@@ -103,6 +109,13 @@ class HiveDb {
 
   Future openMethodBox() async =>
       methodBox = await Hive.openBox(LocalDbConstants.METHOD);
+
+  Future openLocalPrayerBox() async =>
+      localPrayerBox = await Hive.openBox(LocalDbConstants.LOCAL_PRAYER);
+
+  Future openLocalPrayerParentBox() async =>
+      localPrayerParentBox = await Hive.openBox(LocalDbConstants.LOCAL_PRAYER_PARENT);
+
 
   close(String name) => Hive.box(name).close();
 }
