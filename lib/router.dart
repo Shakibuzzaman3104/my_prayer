@@ -9,7 +9,7 @@ import 'package:my_prayer/utils/router_path_constants.dart';
 import 'screens/views/add_prayer.dart';
 
 
-class Router {
+class PathRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case RouterPathsConstants.ADD_PRAYER:

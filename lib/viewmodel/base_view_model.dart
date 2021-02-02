@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:my_prayer/local_database/sharedpreferences.dart';
 import 'package:my_prayer/utils/network_manager.dart';
 
 class BaseViewModel extends ChangeNotifier {
   bool _busy = true;
+
   bool get busy => _busy;
+  MySharedPreferences sharedPreferences = MySharedPreferences.getInstance();
 
   void initConnection(Function connectionChanged) {
     ConnectionStatusChecker connectionStatus =
@@ -13,6 +16,10 @@ class BaseViewModel extends ChangeNotifier {
     connectionStatus.connectionChange.listen((connection) {
       connectionChanged(connection);
     });
+  }
+
+  BaseViewModel(){
+    debugPrint("BaseView Called");
   }
 
   void setBusy(bool value) {

@@ -2,7 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
 import 'package:my_prayer/local_database/sharedpreferences.dart';
+import 'package:my_prayer/model/Date.dart';
 
 import 'package:my_prayer/model/LocalPrayer.dart';
 import 'package:my_prayer/model/ModelLocalPrayerParent.dart';
@@ -84,7 +86,7 @@ class ViewModelDashboard extends BaseViewModel {
           .catchError((e) {});
     });
     //await upcomingPrayer();
-    getDataFromDB();
+   await getDataFromDB();
   }
 
   getDataFromDB() async {
@@ -116,11 +118,7 @@ class ViewModelDashboard extends BaseViewModel {
 
     } else
       debugPrint("Not Found");
-
-    HiveDb.getInstance().prayerBox.close();
-    HiveDb.getInstance().localPrayerParentBox.close();
     await upcomingPrayer();
-
     setBusy(false);
   }
 
@@ -130,6 +128,8 @@ class ViewModelDashboard extends BaseViewModel {
     int t_min = currentTime.minute;
     double finalTime = t_hour + t_min / 60.0;
     double time;
+
+    bool isFound = false;
 
     for (ModelLocalPrayer element in _parentPrayer.prayers) {
       List<String> split = element.time.split(":");
@@ -144,10 +144,20 @@ class ViewModelDashboard extends BaseViewModel {
         continue;
       }
       if (time > finalTime) {
+        debugPrint("Found Prayer");
+        isFound = true;
         _upComingPrayer = element;
         break;
       }
     }
+    if (!isFound) {
+      debugPrint("Not Found");
+      _upComingPrayer =
+           HiveDb.getInstance().localPrayerParentBox.get(DateTime.now().day).prayers[0];
+    }
+
+    HiveDb.getInstance().prayerBox.close();
+    HiveDb.getInstance().localPrayerParentBox.close();
   }
 
   DateTime getCurrentDate() {}
@@ -187,7 +197,7 @@ class ViewModelDashboard extends BaseViewModel {
     flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
     var android = new AndroidInitializationSettings('@mipmap/ic_launcher');
     var iOS = new IOSInitializationSettings();
-    var initSettings = new InitializationSettings(android, iOS);
+    var initSettings = new InitializationSettings(android: android, iOS: iOS);
     flutterLocalNotificationsPlugin.initialize(initSettings,
         onSelectNotification: onSelectNotification);
   }
@@ -208,28 +218,43 @@ class ViewModelDashboard extends BaseViewModel {
     );
   }
 
-/*  Future addNotification({int pos, int id}) async {
-    print(int.parse(prayers[pos].hour));
+  Future addNotification({int pos, int id}) async {
+    List<String> time = _parentPrayer.prayers[pos].time.split(":");
+    var date = DateTime.fromMillisecondsSinceEpoch(
+        int.parse(_parentPrayer.date) * 1000);
 
-    var time =
-        Time(int.parse(prayers[pos].hour), int.parse(prayers[pos].min), 0);
-    //var time = Time(13, 17, 0);
+    var newDate = new DateTime(date.year, date.month, date.day,
+        int.parse(time[0]), int.parse(time[1]), 0);
+
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         '${id.toString()}',
-        '${prayers[pos].name}',
-        'Its time for ${prayers[pos].name} Salah');
+        '${_parentPrayer.prayers[pos].name}',
+        'Its time for ${_parentPrayer.prayers[pos].name} Salah');
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+        id,
+        "${_parentPrayer.prayers[pos].name} prayer",
+        "It's time for your prayer",
+        newDate,
+        platformChannelSpecifics,
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.wallClockTime);
+
+/*
     await flutterLocalNotificationsPlugin.showDailyAtTime(
         id,
         '${prayers[pos].name} prayer',
         "It's time for your prayer",
         time,
         platformChannelSpecifics);
-
+*/
     updateStatus(id, 1);
-  }*/
+  }
 
   Future removeNotification(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);

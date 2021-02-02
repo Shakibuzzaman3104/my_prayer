@@ -55,7 +55,7 @@ class _DashboardState extends State<Dashboard> {
                           style: TextStyle(
                               fontWeight: FontWeight.normal,
                               fontSize: SizeConfig.textMultiplier * 2,
-                              color: ColorConstants.SUBTITLE),
+                              color: Theme.of(context).accentColor),
                         ),
                         SizedBox(
                           height: SizeConfig.imageSizeMultiplier,
@@ -66,6 +66,7 @@ class _DashboardState extends State<Dashboard> {
                               viewmodel.upComingPrayer.name + ", ",
                               style: TextStyle(
                                   fontSize: SizeConfig.textMultiplier * 2.5,
+                                  color: Theme.of(context).primaryColor,
                                   fontWeight: FontWeight.bold),
                             ),
                             WidgetTime(
@@ -82,13 +83,19 @@ class _DashboardState extends State<Dashboard> {
                       children: [
                         appBarIcons(
                           isAP: viewmodel.isAmPmSelected,
-                            icon: "assets/img/sunrise.svg", time:viewmodel.parentPrayer.prayers[1].time,),
+                          icon: "assets/img/sunrise.svg",
+                          time: viewmodel.parentPrayer.prayers[1].time,
+                          context: context
+                        ),
                         SizedBox(
                           width: SizeConfig.widthMultiplier * 5,
                         ),
                         appBarIcons(
                           isAP: viewmodel.isAmPmSelected,
-                          icon: "assets/img/sunset.svg", time:viewmodel.parentPrayer.prayers[4].time,),
+                          icon: "assets/img/sunset.svg",
+                          time: viewmodel.parentPrayer.prayers[4].time,
+                          context: context
+                        ),
                       ],
                     ),
                   ],
@@ -105,18 +112,18 @@ class _DashboardState extends State<Dashboard> {
                       leading: WidgetCircularItem(
                         icon: Icon(
                           Icons.location_on,
-                          color: ColorConstants.ICON,
+                          color: Theme.of(context).primaryColor,
                           size: SizeConfig.imageSizeMultiplier * 6,
                         ),
                       ),
                       title: Text(
                         "Dhaka, Bangladesh",
-                        style: TextStyle(color: ColorConstants.TITLE),
+                        style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                       subtitle: Text(
                         "Current location",
                         style: TextStyle(
-                            color: ColorConstants.SUBTITLE,
+                            color: Theme.of(context).accentColor,
                             fontSize: SizeConfig.textMultiplier * 1.2,
                             fontWeight: FontWeight.bold),
                       ),
@@ -125,18 +132,18 @@ class _DashboardState extends State<Dashboard> {
                       leading: WidgetCircularItem(
                         icon: Icon(
                           Icons.date_range,
-                          color: ColorConstants.ICON,
+                          color: Theme.of(context).accentColor,
                           size: SizeConfig.imageSizeMultiplier * 6,
                         ),
                       ),
                       title: Text(
                         "03 Jumail Awal 1440 H",
-                        style: TextStyle(color: ColorConstants.TITLE),
+                        style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                       subtitle: Text(
                         "Today's date",
                         style: TextStyle(
-                            color: ColorConstants.SUBTITLE,
+                            color: Theme.of(context).accentColor,
                             fontSize: SizeConfig.textMultiplier * 1.2,
                             fontWeight: FontWeight.bold),
                       ),
@@ -148,9 +155,9 @@ class _DashboardState extends State<Dashboard> {
                       alignment: Alignment.centerRight,
                       child: ToggleButtons(
                         selectedBorderColor: null,
-                        fillColor: ColorConstants.CARD,
-                        color: ColorConstants.SUBTITLE,
-                        selectedColor: ColorConstants.TITLE,
+                        fillColor: Theme.of(context).cardColor,
+                        color: Theme.of(context).accentColor,
+                        selectedColor: Theme.of(context).primaryColor,
                         borderRadius: BorderRadius.circular(
                             SizeConfig.imageSizeMultiplier),
                         children: <Widget>[
@@ -192,8 +199,7 @@ class _DashboardState extends State<Dashboard> {
   }
 }
 
-Widget appBarIcons(
-    {String icon, String time, final bool isAP}) {
+Widget appBarIcons({String icon, String time, final bool isAP,@required BuildContext context}) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
@@ -201,7 +207,7 @@ Widget appBarIcons(
         icon,
         height: SizeConfig.imageSizeMultiplier * 7,
         width: SizeConfig.imageSizeMultiplier * 7,
-        color: ColorConstants.ICON,
+        color: Theme.of(context).primaryColor,
       ),
       WidgetTime(
         isAP: isAP,

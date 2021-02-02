@@ -67,4 +67,13 @@ class MySharedPreferences {
   Future<bool> getIsAP() async {
     return _sharedPreferences.getBool("ap") ?? false;
   }
+
+  Future<bool> setIsDark(bool theme) async {
+    return await _sharedPreferences.setBool("theme", theme);
+  }
+
+  Future<bool> getIsDark() async {
+    return _sharedPreferences.getBool("theme") ?? false;
+  }
+
 }

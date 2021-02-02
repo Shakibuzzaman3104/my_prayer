@@ -27,7 +27,7 @@ dependencies:
   intl: 0.17.0-nullsafety.2
   dio: 3.0.10
   provider:
-  flutter_local_notifications: ^1.4.2
+  flutter_local_notifications:  3.0.1+4
   geolocator: ^6.1.14
   hive: ^1.4.4+1
   hive_flutter: ^0.3.1

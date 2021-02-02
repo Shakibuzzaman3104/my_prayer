@@ -7,24 +7,33 @@ import 'package:my_prayer/local_database/sharedpreferences.dart';
 import 'package:my_prayer/localization/Localization.dart';
 import 'package:my_prayer/provider_setup.dart';
 import 'package:my_prayer/responsive/sizeconfig.dart';
+import 'package:my_prayer/router.dart';
 import 'package:my_prayer/screens/views/home.dart';
 import 'package:my_prayer/server_setup/local_database.dart';
+import 'package:my_prayer/viewmodel/theme_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'utils/themeData.dart';
 import 'viewmodel/language_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var instance = MySharedPreferences.getInstance();
   await instance.createPref();
+  bool darkModeOn = await instance.getIsDark();
   await Hive.initFlutter();
   HiveDb.getInstance().init();
   LanguageProvider languageProvider = LanguageProvider();
   await languageProvider.fetchLocale();
   runApp(
     MultiProvider(
-      child: new MyApp(languageProvider: languageProvider),
+      child: ChangeNotifierProvider<ThemeViewModel>(
+        create: (_) => ThemeViewModel(darkModeOn ? darkTheme : lightTheme),
+        child: MyApp(
+          languageProvider: languageProvider,
+        ),
+      ),
       providers: providers,
     ),
   );
@@ -39,6 +48,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeViewModel = Provider.of<ThemeViewModel>(context);
+    themeViewModel.getIsDark();
     return ChangeNotifierProvider<LanguageProvider>(
       create: (_) => languageProvider,
       child: Consumer<LanguageProvider>(
@@ -47,6 +58,7 @@ class MyApp extends StatelessWidget {
             builder: (context, orientation) {
               SizeConfig().init(constraints, orientation);
               return MaterialApp(
+                onGenerateRoute: PathRouter.generateRoute,
                 locale: model.appLocal,
                 supportedLocales: [
                   Locale('en', 'US'),
@@ -60,24 +72,26 @@ class MyApp extends StatelessWidget {
                   GlobalCupertinoLocalizations.delegate
                 ],
                 debugShowCheckedModeBanner: false,
-                theme: ThemeData(
-                  fontFamily: "Barlow",
-                  backgroundColor: Colors.indigo,
-                  textTheme: Theme.of(context).textTheme.copyWith(
-                        headline6: TextStyle(
-                            fontSize: 80,
-                            fontWeight: FontWeight.w300,
-                            color: Colors.white),
+                theme: themeViewModel.getTheme(),
+                home: Consumer<ThemeViewModel>(
+                  builder: (context, themeModel, child) {
+                    return AnnotatedRegion<SystemUiOverlayStyle>(
+                      value: SystemUiOverlayStyle(
+                        statusBarColor: Colors.transparent,
+                        // transparent status bar
+                        systemNavigationBarColor:
+                            themeViewModel.theme ? Colors.white : Colors.black,
+                        // navigation bar color
+                        statusBarIconBrightness:
+                        themeViewModel.theme  ? Brightness.light : Brightness.dark,
+                        // status bar icons' color
+                        systemNavigationBarIconBrightness: themeViewModel.theme
+                            ? Brightness.light
+                            : Brightness.dark, //navigation bar icons' color
                       ),
-                ),
-                home: AnnotatedRegion<SystemUiOverlayStyle>(
-                    value: SystemUiOverlayStyle(
-                      statusBarColor: Colors.transparent, // transparent status bar
-                      systemNavigationBarColor: Colors.black, // navigation bar color
-                      statusBarIconBrightness: Brightness.dark, // status bar icons' color
-                      systemNavigationBarIconBrightness: Brightness.dark, //navigation bar icons' color
-                    ),
-                 child: HomeView(),
+                      child: HomeView(),
+                    );
+                  }
                 ),
               );
             },

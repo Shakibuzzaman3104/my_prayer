@@ -28,23 +28,6 @@ class PrayerRepository {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.low);
 
-    /*  final coordinates = new Coordinates(position.latitude, position.longitude);
-    var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-
-    var first = addresses.first;
-    print("${first.featureName} : ${first.addressLine}");*/
-
-    /*  await determinePosition().then((_) async {
-      int method = await mySharedPreferences.getMethod();
-      ApiClient apiClient = ApiClient.getInstance();
-      response = await apiClient.fetchData(
-          endPoint:
-          "latitude=${position.latitude}&longitude=${position.longitude}&method=$method&month=${position.timestamp.month}&year=${position.timestamp.year}");
-
-      await mySharedPreferences.setPreviousMonth(DateTime.now().month);
-      await insertIntoDb(ModelPrayer.fromJson(response.data));
-    });*/
-
     if (month != DateTime.now().month ||
         lastPosition.longitude != position.longitude ||
         lastPosition.latitude != position.latitude) {
@@ -75,26 +58,33 @@ class PrayerRepository {
     await HiveDb.getInstance().prayerBox.clear();
     await HiveDb.getInstance().localPrayerBox.clear();
 
+    int id = 0;
     for (Datum data in prayer.data) {
       List<ModelLocalPrayer> localPrayer = [];
       localPrayer.add(ModelLocalPrayer(
-          name: "Fajr", time: data.timings.fajr.split(" (")[0]));
+          id: id++, name: "Fajr", time: data.timings.fajr.split(" (")[0]));
       localPrayer.add(ModelLocalPrayer(
-          name: "Sunrise", time: data.timings.sunrise.split(" (")[0]));
+          id: id++,
+          name: "Sunrise",
+          time: data.timings.sunrise.split(" (")[0]));
       localPrayer.add(ModelLocalPrayer(
-          name: "Dhuhr", time: data.timings.dhuhr.split(" (")[0]));
-      localPrayer.add(
-          ModelLocalPrayer(name: "Asr", time: data.timings.asr.split(" (")[0]));
+          id: id++, name: "Dhuhr", time: data.timings.dhuhr.split(" (")[0]));
       localPrayer.add(ModelLocalPrayer(
-          name: "Sunset", time: data.timings.sunset.split(" (")[0]));
+          id: id++, name: "Asr", time: data.timings.asr.split(" (")[0]));
       localPrayer.add(ModelLocalPrayer(
-          name: "Maghrib", time: data.timings.maghrib.split(" (")[0]));
+          id: id++, name: "Sunset", time: data.timings.sunset.split(" (")[0]));
       localPrayer.add(ModelLocalPrayer(
-          name: "Isha", time: data.timings.isha.split(" (")[0]));
+          id: id++,
+          name: "Maghrib",
+          time: data.timings.maghrib.split(" (")[0]));
       localPrayer.add(ModelLocalPrayer(
-          name: "Imsak", time: data.timings.imsak.split(" (")[0]));
+          id: id++, name: "Isha", time: data.timings.isha.split(" (")[0]));
       localPrayer.add(ModelLocalPrayer(
-          name: "Midnight", time: data.timings.midnight.split(" (")[0]));
+          id: id++, name: "Imsak", time: data.timings.imsak.split(" (")[0]));
+      localPrayer.add(ModelLocalPrayer(
+          id: id++,
+          name: "Midnight",
+          time: data.timings.midnight.split(" (")[0]));
 
       await HiveDb.getInstance().localPrayerBox.addAll(localPrayer);
 
@@ -102,6 +92,8 @@ class PrayerRepository {
           HiveList(HiveDb.getInstance().localPrayerBox);
 
       atby.addAll(localPrayer);
+
+      debugPrint("$id");
 
       await HiveDb.getInstance().localPrayerParentBox.add(
           ModelLocalPrayerParent(date: data.date.timestamp, prayers: atby));

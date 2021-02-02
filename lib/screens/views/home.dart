@@ -29,12 +29,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Consumer<ViewModelHome>(builder: (context, home, child) {
       return Container(
-        decoration: BoxDecoration(color: ColorConstants.BACKGROUND
-            /* gradient: LinearGradient(
-                  begin: Alignment.bottomLeft,
-                  end: Alignment.topRight,
-                  colors: [Color(0xFFFFFFFF), Color(0xFFFFFFFF)]),*/
-            ),
+        color: Theme.of(context).backgroundColor,
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: _widgetOptions[home.position],
@@ -49,7 +44,7 @@ class _HomeViewState extends State<HomeView> {
                   "assets/img/home.svg",
                   height: SizeConfig.imageSizeMultiplier * 6,
                   width: SizeConfig.imageSizeMultiplier * 6,
-                  color: home.position ==0 ? ColorConstants.TITLE: ColorConstants.SUBTITLE,
+                  color: home.position ==0 ? Theme.of(context).primaryColor: Theme.of(context).accentColor,
                 ),
                 label: 'Home',
               ),
@@ -58,7 +53,7 @@ class _HomeViewState extends State<HomeView> {
                   "assets/img/compass.svg",
                   height: SizeConfig.imageSizeMultiplier * 6,
                   width: SizeConfig.imageSizeMultiplier * 6,
-                  color:home.position ==1 ? ColorConstants.TITLE: ColorConstants.SUBTITLE,
+                  color:home.position ==1 ? Theme.of(context).primaryColor: Theme.of(context).accentColor,
                 ),
                 label: 'Home',
               ),
@@ -67,7 +62,7 @@ class _HomeViewState extends State<HomeView> {
                   "assets/img/reminder.svg",
                   height: SizeConfig.imageSizeMultiplier * 6,
                   width: SizeConfig.imageSizeMultiplier * 6,
-                  color: home.position ==2 ? ColorConstants.TITLE: ColorConstants.SUBTITLE,
+                  color: home.position ==2 ? Theme.of(context).primaryColor: Theme.of(context).accentColor,
                 ),
                 label: 'Home',
               ),
@@ -76,7 +71,7 @@ class _HomeViewState extends State<HomeView> {
                   "assets/img/settings.svg",
                   height: SizeConfig.imageSizeMultiplier * 6,
                   width: SizeConfig.imageSizeMultiplier * 6,
-                  color: ColorConstants.SUBTITLE,
+                  color: Theme.of(context).accentColor,
                 ),
                 label: 'Home',
               ),

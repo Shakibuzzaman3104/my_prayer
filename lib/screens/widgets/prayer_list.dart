@@ -51,7 +51,7 @@ class _WidgetPrayerListState extends State<WidgetPrayerList> {
             margin:
                 EdgeInsets.symmetric(vertical: SizeConfig.widthMultiplier * 2),
             decoration: BoxDecoration(
-              color: ColorConstants.CARD,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.all(
                   Radius.circular(SizeConfig.imageSizeMultiplier * 2)),
             ),
@@ -71,7 +71,7 @@ class _WidgetPrayerListState extends State<WidgetPrayerList> {
                         widget.prayer[position].name,
                         style: TextStyle(
                             fontWeight: FontWeight.w500,
-                            color: ColorConstants.SUBTITLE,
+                            color: Theme.of(context).accentColor,
                             fontSize: SizeConfig.textMultiplier * 2),
                       ),
                       WidgetTime(
@@ -93,12 +93,12 @@ class _WidgetPrayerListState extends State<WidgetPrayerList> {
                             ? Icon(
                                 Icons.access_alarm,
                                 size: SizeConfig.imageSizeMultiplier * 8,
-                                color: ColorConstants.TITLE,
+                                color: Theme.of(context).primaryColor,
                               )
                             : Icon(
                                 Icons.alarm_off,
                                 size: SizeConfig.imageSizeMultiplier * 8,
-                                color: ColorConstants.SUBTITLE,
+                                color: Theme.of(context).accentColor,
                               ),
                         onPressed: () => widget.onAlarmClick(position),
                       ),
