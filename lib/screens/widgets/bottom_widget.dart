@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:my_prayer/localization/Localization.dart';
 import 'package:my_prayer/model/LocalPrayer.dart';
 import 'package:my_prayer/utils/language_constants.dart';
-import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
+import 'package:my_prayer/viewmodel/viewmodel_dashboard.dart';
 import 'package:provider/provider.dart';
 
 class WidgetBottomSheet extends StatefulWidget {
@@ -45,7 +45,7 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
           ),
           backgroundColor: Colors.white,
           context: context,
-          builder: (_) => Consumer<ViewModelPrayers>(
+          builder: (_) => Consumer<ViewModelDashboard>(
                 builder: (context, value, child) => Scaffold(
                   backgroundColor: Colors.transparent,
                   body: SingleChildScrollView(

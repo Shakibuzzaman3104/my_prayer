@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:my_prayer/responsive/sizeconfig.dart';
 import 'package:my_prayer/screens/widgets/home/widget_circular_icon.dart';
 import 'package:my_prayer/screens/widgets/prayer_list.dart';
+import 'package:my_prayer/screens/widgets/widget_time.dart';
 import 'package:my_prayer/utils/color_constants.dart';
 import 'package:my_prayer/viewmodel/language_provider.dart';
-import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
+import 'package:my_prayer/viewmodel/viewmodel_dashboard.dart';
 import 'package:provider/provider.dart';
 
 class Dashboard extends StatefulWidget {
@@ -14,11 +16,11 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  ViewModelPrayers model;
+  ViewModelDashboard model;
 
   @override
   void initState() {
-    model = Provider.of<ViewModelPrayers>(context, listen: false);
+    model = Provider.of<ViewModelDashboard>(context, listen: false);
     model.fetchPrayers();
     super.initState();
   }
@@ -26,7 +28,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Consumer<LanguageProvider>(builder: (context, language, child) {
-      return Consumer<ViewModelPrayers>(
+      return Consumer<ViewModelDashboard>(
         builder: (context, viewmodel, child) => Container(
           padding: EdgeInsets.only(
             left: SizeConfig.widthMultiplier * 3,
@@ -55,24 +57,38 @@ class _DashboardState extends State<Dashboard> {
                               fontSize: SizeConfig.textMultiplier * 2,
                               color: ColorConstants.SUBTITLE),
                         ),
-                        Text(
-                          "Isha, 4:05 PM",
-                          style: TextStyle(
-                              color: ColorConstants.TITLE,
-                              fontWeight: FontWeight.bold,
-                              fontSize: SizeConfig.textMultiplier * 3),
+                        SizedBox(
+                          height: SizeConfig.imageSizeMultiplier,
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              viewmodel.upComingPrayer.name + ", ",
+                              style: TextStyle(
+                                  fontSize: SizeConfig.textMultiplier * 2.5,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            WidgetTime(
+                              isAP: viewmodel.isAmPmSelected,
+                              titleSize: SizeConfig.textMultiplier * 2.5,
+                              time: viewmodel.upComingPrayer.time,
+                              subTitleSize: SizeConfig.textMultiplier * 2,
+                            ),
+                          ],
                         ),
                       ],
                     ),
                     Row(
                       children: [
                         appBarIcons(
-                            icon: "assets/img/sunrise.svg", time: "6:15 AM"),
+                          isAP: viewmodel.isAmPmSelected,
+                            icon: "assets/img/sunrise.svg", time:viewmodel.parentPrayer.prayers[1].time,),
                         SizedBox(
                           width: SizeConfig.widthMultiplier * 5,
                         ),
                         appBarIcons(
-                            icon: "assets/img/sunset.svg", time: "6:35 PM"),
+                          isAP: viewmodel.isAmPmSelected,
+                          icon: "assets/img/sunset.svg", time:viewmodel.parentPrayer.prayers[4].time,),
                       ],
                     ),
                   ],
@@ -125,12 +141,47 @@ class _DashboardState extends State<Dashboard> {
                             fontWeight: FontWeight.bold),
                       ),
                     ),
+                    Container(
+                      padding: EdgeInsets.only(
+                          right: SizeConfig.widthMultiplier * 4),
+                      height: SizeConfig.heightMultiplier * 2.4,
+                      alignment: Alignment.centerRight,
+                      child: ToggleButtons(
+                        selectedBorderColor: null,
+                        fillColor: ColorConstants.CARD,
+                        color: ColorConstants.SUBTITLE,
+                        selectedColor: ColorConstants.TITLE,
+                        borderRadius: BorderRadius.circular(
+                            SizeConfig.imageSizeMultiplier),
+                        children: <Widget>[
+                          Text(
+                            " AM/PM ",
+                            style: TextStyle(
+                                fontSize: SizeConfig.textMultiplier * 1.2),
+                          ),
+                          Text(
+                            "24 hr",
+                            style: TextStyle(
+                                fontSize: SizeConfig.textMultiplier * 1.2),
+                          )
+                        ],
+                        onPressed: (index) => viewmodel.toggleTimeFormat(index),
+                        isSelected: viewmodel.apToggle,
+                      ),
+                    ),
                   ],
                 ),
               ),
               Expanded(
-                child: WidgetPrayerList(
-                  prayer: viewmodel.parentPrayer.prayers,
+                child: Container(
+                  margin: EdgeInsets.only(top: SizeConfig.heightMultiplier),
+                  child: WidgetPrayerList(
+                    isAmPm: viewmodel.isAmPmSelected,
+                    prayer: viewmodel.parentPrayer.prayers,
+                    onAlarmClick: (int pos) {
+                      debugPrint("$pos");
+                    },
+                  ),
                 ),
               ),
             ],
@@ -141,7 +192,8 @@ class _DashboardState extends State<Dashboard> {
   }
 }
 
-Widget appBarIcons({String icon, String time}) {
+Widget appBarIcons(
+    {String icon, String time, final bool isAP}) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
@@ -151,12 +203,11 @@ Widget appBarIcons({String icon, String time}) {
         width: SizeConfig.imageSizeMultiplier * 7,
         color: ColorConstants.ICON,
       ),
-      Text(
-        time,
-        style: TextStyle(
-          fontSize: SizeConfig.textMultiplier * 1.5,
-          color: ColorConstants.TITLE,
-        ),
+      WidgetTime(
+        isAP: isAP,
+        titleSize: SizeConfig.textMultiplier * 1.6,
+        time: time,
+        subTitleSize: SizeConfig.textMultiplier * 1.2,
       ),
     ],
   );

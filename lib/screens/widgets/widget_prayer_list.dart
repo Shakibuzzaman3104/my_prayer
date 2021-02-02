@@ -4,7 +4,7 @@ import 'package:my_prayer/localization/Localization.dart';
 import 'package:my_prayer/screens/widgets/bottom_widget.dart';
 import 'package:my_prayer/utils/en_to_bd_number.dart';
 import 'package:my_prayer/viewmodel/language_provider.dart';
-import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
+import 'package:my_prayer/viewmodel/viewmodel_dashboard.dart';
 import 'package:provider/provider.dart';
 
 class WidgetPrayerList extends StatefulWidget {
@@ -19,11 +19,11 @@ class WidgetPrayerList extends StatefulWidget {
 }
 
 class _WidgetPrayerListState extends State<WidgetPrayerList> {
-  ViewModelPrayers viewModelPrayers;
+  ViewModelDashboard viewModelPrayers;
 
   @override
   void initState() {
-    viewModelPrayers = Provider.of<ViewModelPrayers>(context, listen: false);
+    viewModelPrayers = Provider.of<ViewModelDashboard>(context, listen: false);
     viewModelPrayers.fetchPrayers();
     super.initState();
   }

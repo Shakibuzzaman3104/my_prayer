@@ -1,6 +1,6 @@
 import 'package:my_prayer/viewmodel/viewmodel_home.dart';
 import 'package:my_prayer/viewmodel/viewmodel_navigation.dart';
-import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
+import 'package:my_prayer/viewmodel/viewmodel_dashboard.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -14,7 +14,7 @@ List<SingleChildWidget> providers = [
 List<SingleChildWidget> independentServices = [
   ChangeNotifierProvider<LanguageProvider>(create: (_) => LanguageProvider()),
   ChangeNotifierProvider<ViewModelHome>(create: (_) => ViewModelHome()),
-  ChangeNotifierProvider<ViewModelPrayers>(create: (_) => ViewModelPrayers()),
+  ChangeNotifierProvider<ViewModelDashboard>(create: (_) => ViewModelDashboard()),
   ChangeNotifierProvider<ViewModelNavigation>(
       create: (_) => ViewModelNavigation()),
 ];

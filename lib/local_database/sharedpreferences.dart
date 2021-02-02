@@ -49,7 +49,7 @@ class MySharedPreferences {
   }
 
   Future<int> getPreviousMonth() async {
-    return _sharedPreferences.getInt("month")??-1;
+    return _sharedPreferences.getInt("month") ?? -1;
   }
 
   Future<bool> setAddress(String address) async {
@@ -57,6 +57,14 @@ class MySharedPreferences {
   }
 
   Future<int> getAddress() async {
-    return _sharedPreferences.getInt("address")??"No name";
+    return _sharedPreferences.getInt("address") ?? "No name";
+  }
+
+  Future<bool> setIsAP(bool ap) async {
+    return await _sharedPreferences.setBool("ap", ap);
+  }
+
+  Future<bool> getIsAP() async {
+    return _sharedPreferences.getBool("ap") ?? false;
   }
 }

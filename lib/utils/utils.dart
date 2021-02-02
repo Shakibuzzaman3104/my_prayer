@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 /// Determine the current position of the device.
@@ -27,4 +28,20 @@ Future determinePosition() async {
           'Location permissions are denied (actual value: $permission).');
     }
   }
+}
+
+List<String> convertTimeToAP(String time) {
+  List<String> split = time.split(":");
+  int hour = int.parse(split[0]);
+  int min = int.parse(split[1]);
+
+  TimeOfDay noonTime = TimeOfDay(hour: hour, minute: min); // 3:00 PM
+
+  if (noonTime.period == DayPeriod.am)
+    return [time, " AM"];
+  else
+    return [
+      "${noonTime.hourOfPeriod == 0 ? 12 : noonTime.hourOfPeriod < 10 ? "0${noonTime.hourOfPeriod}" : noonTime.hourOfPeriod}:${min < 10 ? "0$min" : min}",
+      " PM"
+    ];
 }

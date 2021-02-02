@@ -6,7 +6,7 @@ import 'package:my_prayer/screens/widgets/settings_toogle.dart';
 import 'package:my_prayer/utils/en_to_bd_number.dart';
 import 'package:my_prayer/utils/language_constants.dart';
 import 'package:my_prayer/viewmodel/language_provider.dart';
-import 'package:my_prayer/viewmodel/viewmodel_prayers.dart';
+import 'package:my_prayer/viewmodel/viewmodel_dashboard.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,12 +15,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  ViewModelPrayers model;
+  ViewModelDashboard model;
   double _value = 0;
 
   @override
   void initState() {
-    model = Provider.of<ViewModelPrayers>(context, listen: false);
+    model = Provider.of<ViewModelDashboard>(context, listen: false);
     model.fetchPrayers();
     super.initState();
   }
@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
       key: _scaffoldKey,
       backgroundColor: Theme.of(context).backgroundColor,
       body: Consumer<LanguageProvider>(builder: (context, data, child) {
-        return Consumer<ViewModelPrayers>(
+        return Consumer<ViewModelDashboard>(
           builder: (ctx, value, child) => TweenAnimationBuilder(
             duration: Duration(milliseconds: 600),
             tween: Tween<double>(
