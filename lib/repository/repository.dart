@@ -49,8 +49,8 @@ class PrayerRepository {
   }
 
   Future insertIntoDb(ModelPrayer prayer) async {
-    debugPrint("${prayer.data.length}");
     await HiveDb.getInstance().openPrayerBox();
+    await HiveDb.getInstance().openAlarmsBox();
     await HiveDb.getInstance().openLocalPrayerBox();
     await HiveDb.getInstance().openLocalPrayerParentBox();
 
@@ -93,21 +93,19 @@ class PrayerRepository {
 
       atby.addAll(localPrayer);
 
-      debugPrint("$id");
 
       await HiveDb.getInstance().localPrayerParentBox.add(
           ModelLocalPrayerParent(date: data.date.timestamp, prayers: atby));
     }
 
-    debugPrint("${HiveDb.getInstance().localPrayerParentBox.values.length}");
+    for (int i = 0; i < 9; i++) {
+      await HiveDb.getInstance().alarms.add(false);
+    }
 
     await HiveDb.getInstance().prayerBox.add(prayer);
-
     await HiveDb.getInstance().prayerBox.close();
     await HiveDb.getInstance().localPrayerBox.close();
   }
-
-  Future updateStatus(int id, int status) async {}
 
   Future updatePrayer(ModelLocalPrayer modelPrayer) async {}
 }

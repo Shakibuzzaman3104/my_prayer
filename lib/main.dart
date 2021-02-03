@@ -73,6 +73,7 @@ class MyApp extends StatelessWidget {
                 ],
                 debugShowCheckedModeBanner: false,
                 theme: themeViewModel.getTheme(),
+                darkTheme: darkTheme,
                 home: Consumer<ThemeViewModel>(
                   builder: (context, themeModel, child) {
                     return AnnotatedRegion<SystemUiOverlayStyle>(

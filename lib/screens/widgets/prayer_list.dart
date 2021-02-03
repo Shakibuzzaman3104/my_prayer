@@ -15,22 +15,23 @@ import 'package:my_prayer/viewmodel/viewmodel_dashboard.dart';
 import 'package:provider/provider.dart';
 
 class WidgetPrayerList extends StatefulWidget {
-  final GlobalKey<ScaffoldState> globalKey;
   final List<ModelLocalPrayer> prayer;
+  final List<bool> alarms;
   final Function onAlarmClick;
   final bool isAmPm;
 
   WidgetPrayerList(
-      {this.globalKey,
-      @required this.prayer,
+      {@required this.prayer,
       @required this.onAlarmClick,
+      @required this.alarms,
       @required this.isAmPm});
 
   @override
   _WidgetPrayerListState createState() => _WidgetPrayerListState();
 }
 
-class _WidgetPrayerListState extends State<WidgetPrayerList> {
+class _WidgetPrayerListState extends State<WidgetPrayerList>
+    with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
@@ -38,6 +39,7 @@ class _WidgetPrayerListState extends State<WidgetPrayerList> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return ListView.builder(
         key: UniqueKey(),
         padding: EdgeInsets.only(
@@ -89,7 +91,7 @@ class _WidgetPrayerListState extends State<WidgetPrayerList> {
                         width: SizeConfig.widthMultiplier * 3,
                       ),
                       IconButton(
-                        icon: widget.prayer[position].status == 1
+                        icon: widget.alarms[position]
                             ? Icon(
                                 Icons.access_alarm,
                                 size: SizeConfig.imageSizeMultiplier * 8,
@@ -111,4 +113,8 @@ class _WidgetPrayerListState extends State<WidgetPrayerList> {
         },
         itemCount: widget.prayer.length);
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

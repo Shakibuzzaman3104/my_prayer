@@ -31,4 +31,6 @@ class LocalDbConstants{
 
   static String LOCAL_PRAYER_PARENT="local_parent";
 
+  static String ALARMS="alarms";
+
 }

@@ -183,10 +183,11 @@ class _DashboardState extends State<Dashboard> {
                 child: Container(
                   margin: EdgeInsets.only(top: SizeConfig.heightMultiplier),
                   child: WidgetPrayerList(
+                    alarms: viewmodel.alarms,
                     isAmPm: viewmodel.isAmPmSelected,
                     prayer: viewmodel.parentPrayer.prayers,
                     onAlarmClick: (int pos) {
-                      debugPrint("$pos");
+                      viewmodel.addAlarm(pos: pos);
                     },
                   ),
                 ),

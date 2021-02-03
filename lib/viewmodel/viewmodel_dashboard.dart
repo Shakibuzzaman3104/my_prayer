@@ -1,3 +1,7 @@
+import 'dart:isolate';
+import 'dart:ui';
+
+import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +23,39 @@ class ViewModelDashboard extends BaseViewModel {
   bool isOnline = false;
   ModelLocalPrayerParent _parentPrayer;
   ModelLocalPrayer _upComingPrayer;
-
+  ModelPrayer _prayers;
+  final ReceivePort port = ReceivePort();
+  static const String isolateName = 'isolate';
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   BuildContext context;
   MySharedPreferences sharedPreferences = MySharedPreferences.getInstance();
+  static SendPort uiSendPort;
 
   List<bool> _apToggle = [false, true];
+  List<bool> _alarms = [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ];
+
+  //Getter
+  List<bool> get apToggle => _apToggle;
+
+  List<bool> get alarms => _alarms;
+
+  ModelPrayer get prayers => _prayers;
+
+  ModelLocalPrayerParent get parentPrayer => _parentPrayer;
+
+  ModelLocalPrayer get upComingPrayer => _upComingPrayer;
+
+  bool get isAmPmSelected => _apToggle[0] ? true : false;
 
   void connectionChanged(dynamic hasConnection) {
     print("Connection Changed");
@@ -33,7 +64,12 @@ class ViewModelDashboard extends BaseViewModel {
   }
 
   ViewModelDashboard({this.context}) {
-    initNotification();
+    IsolateNameServer.registerPortWithName(
+      port.sendPort,
+      isolateName,
+    );
+    AndroidAlarmManager.initialize();
+    port.listen((_) async => {});
     this._repository = PrayerRepository();
     _prayers = ModelPrayer();
     _parentPrayer = ModelLocalPrayerParent();
@@ -50,23 +86,6 @@ class ViewModelDashboard extends BaseViewModel {
     await sharedPreferences.setIsAP(_apToggle[0]);
     notifyListeners();
   }
-
-  List<bool> get apToggle => _apToggle;
-
-  bool get isAmPmSelected {
-    if (_apToggle[0]) return true;
-    return false;
-  }
-
-  var time;
-  ModelLocalPrayer nextPrayer = ModelLocalPrayer();
-  ModelPrayer _prayers;
-
-  ModelPrayer get prayers => _prayers;
-
-  ModelLocalPrayerParent get parentPrayer => _parentPrayer;
-
-  ModelLocalPrayer get upComingPrayer => _upComingPrayer;
 
   fetchPrayers() async {
     await checkConnectionStatus().then((value) async {
@@ -86,13 +105,14 @@ class ViewModelDashboard extends BaseViewModel {
           .catchError((e) {});
     });
     //await upcomingPrayer();
-   await getDataFromDB();
+    await getDataFromDB();
   }
 
   getDataFromDB() async {
     await HiveDb.getInstance().openPrayerBox();
     await HiveDb.getInstance().openLocalPrayerParentBox();
     await HiveDb.getInstance().openLocalPrayerBox();
+    await HiveDb.getInstance().openAlarmsBox();
 
     bool ap = await sharedPreferences.getIsAP();
 
@@ -116,6 +136,7 @@ class ViewModelDashboard extends BaseViewModel {
       debugPrint("ViewModel ${_parentPrayer.prayers.length}");
       /**/
 
+      _alarms = HiveDb.getInstance().alarms.values.toList();
     } else
       debugPrint("Not Found");
     await upcomingPrayer();
@@ -152,98 +173,44 @@ class ViewModelDashboard extends BaseViewModel {
     }
     if (!isFound) {
       debugPrint("Not Found");
-      _upComingPrayer =
-           HiveDb.getInstance().localPrayerParentBox.get(DateTime.now().day).prayers[0];
+      _upComingPrayer = HiveDb.getInstance()
+          .localPrayerParentBox
+          .get(DateTime.now().day)
+          .prayers[0];
     }
 
     HiveDb.getInstance().prayerBox.close();
     HiveDb.getInstance().localPrayerParentBox.close();
-  }
-
-  DateTime getCurrentDate() {}
-
-  Future addPrayer(ModelLocalPrayer prayer) async {
-    //setBusy(true);
-    var res = await _repository.addPrayer(prayer);
-    await fetchPrayers();
-    return res;
-  }
-
-  ModelLocalPrayer getNext(List<ModelLocalPrayer> val) {
-    return ModelLocalPrayer();
-  }
-
-  Future updateStatus(int id, int status) async {
-    await _repository.updateStatus(id, status);
-    fetchPrayers();
-  }
-
-  Future deletePrayer(int id) async {
-    removeNotification(id);
-    await _repository.deletePrayer(id);
-    fetchPrayers();
-  }
-
-  Future updatePrayer(ModelLocalPrayer modelPrayer, int pos) async {
-    await _repository.updatePrayer(modelPrayer);
-    // await removeNotification(modelPrayer.id);
-    // addNotification(pos: pos, id: modelPrayer.id);
-    fetchPrayers();
+    HiveDb.getInstance().alarms.close();
   }
 
   //Notification Block
-
-  void initNotification() {
-    flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
-    var android = new AndroidInitializationSettings('@mipmap/ic_launcher');
-    var iOS = new IOSInitializationSettings();
-    var initSettings = new InitializationSettings(android: android, iOS: iOS);
-    flutterLocalNotificationsPlugin.initialize(initSettings,
-        onSelectNotification: onSelectNotification);
-  }
-
-  Future onSelectNotification(String payload) {
-    return showDialog(
-      context: context,
-      builder: (_) => new AlertDialog(
-        title: new Text(
-          'Notification',
-          style: TextStyle(color: Colors.black),
-        ),
-        content: new Text(
-          payload,
-          style: TextStyle(color: Colors.black),
-        ),
-      ),
-    );
-  }
-
-  Future addNotification({int pos, int id}) async {
-    List<String> time = _parentPrayer.prayers[pos].time.split(":");
+  Future addAlarm({int pos, int id, String name}) async {
+   /* List<String> time = _parentPrayer.prayers[pos].time.split(":");
     var date = DateTime.fromMillisecondsSinceEpoch(
         int.parse(_parentPrayer.date) * 1000);
 
     var newDate = new DateTime(date.year, date.month, date.day,
-        int.parse(time[0]), int.parse(time[1]), 0);
+        int.parse(time[0]), int.parse(time[1]), 0);*/
 
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        '${id.toString()}',
-        '${_parentPrayer.prayers[pos].name}',
-        'Its time for ${_parentPrayer.prayers[pos].name} Salah');
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    var platformChannelSpecifics = NotificationDetails(
-        android: androidPlatformChannelSpecifics,
-        iOS: iOSPlatformChannelSpecifics);
-
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-        id,
-        "${_parentPrayer.prayers[pos].name} prayer",
-        "It's time for your prayer",
-        newDate,
-        platformChannelSpecifics,
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.wallClockTime);
+    await AndroidAlarmManager.oneShotAt(
+      DateTime.now().add(Duration(minutes: 1)),
+      // Ensure we have a unique alarm ID.
+      pos,
+      callback,
+      exact: true,
+      wakeup: true,
+      rescheduleOnReboot: true,
+    ).then((value) async => {
+          if (value)
+            {
+              await HiveDb.getInstance().openAlarmsBox(),
+              await HiveDb.getInstance().alarms.putAt(pos, true),
+              _alarms[pos]=true,
+              notifyListeners(),
+              debugPrint("$value")
+            }
+        });
 
 /*
     await flutterLocalNotificationsPlugin.showDailyAtTime(
@@ -253,12 +220,39 @@ class ViewModelDashboard extends BaseViewModel {
         time,
         platformChannelSpecifics);
 */
-    updateStatus(id, 1);
+    //updateStatus(id, 1,name);
   }
 
-  Future removeNotification(int id) async {
+  static Future<void> callback() async {
+    print('Alarm fired!');
+
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        new FlutterLocalNotificationsPlugin();
+    var android = new AndroidInitializationSettings('@mipmap/ic_launcher');
+    var iOS = new IOSInitializationSettings();
+    var initSettings = new InitializationSettings(android: android, iOS: iOS);
+    flutterLocalNotificationsPlugin.initialize(initSettings,
+        onSelectNotification: (pay) {
+      return null;
+    });
+    var androidPlatformChannelSpecifics =
+        AndroidNotificationDetails('0', 'Hello', 'Value is');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+        0, "Prayer", "It's your prayer time", platformChannelSpecifics);
+
+    // This will be null if we're running in the background.
+    uiSendPort ??= IsolateNameServer.lookupPortByName(isolateName);
+    uiSendPort?.send(null);
+  }
+
+  Future removeNotification(int id, String name) async {
     await flutterLocalNotificationsPlugin.cancel(id);
-    updateStatus(id, 0);
+    // updateStatus(id, 0, name);
   }
 
   @override

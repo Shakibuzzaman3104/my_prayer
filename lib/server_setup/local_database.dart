@@ -44,6 +44,7 @@ class HiveDb {
   Box<HijriMonth> hijriMonthBox;
   Box<Method> methodBox;
   Box<Params> paramsBox;
+  Box<bool> alarms;
 
   Future init() async {
     var _directory = await getApplicationDocumentsDirectory();
@@ -115,6 +116,9 @@ class HiveDb {
 
   Future openLocalPrayerParentBox() async =>
       localPrayerParentBox = await Hive.openBox(LocalDbConstants.LOCAL_PRAYER_PARENT);
+
+  Future openAlarmsBox() async =>
+      alarms = await Hive.openBox(LocalDbConstants.ALARMS);
 
 
   close(String name) => Hive.box(name).close();

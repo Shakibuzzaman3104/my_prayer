@@ -10,12 +10,10 @@ class ModelLocalPrayer extends HiveObject{
   String name;
   @HiveField(2)
   String time;
-  @HiveField(3)
-  int status;
 
  // List<UpComingPrayer> adjacentNodes;
 
-  ModelLocalPrayer({this.id,this.name,  this.time,this.status=0});
+  ModelLocalPrayer({this.id,this.name,  this.time});
 
 /*
   UpComingPrayer.clone(UpComingPrayer source) :
@@ -32,7 +30,6 @@ class ModelLocalPrayer extends HiveObject{
     id = json['id'];
     name = json['name'];
     time = json['time'];
-    status = json['status'];
   }
 
   Map<String, dynamic> toMap() {
@@ -40,7 +37,6 @@ class ModelLocalPrayer extends HiveObject{
     data['id'] = this.id;
     data['name'] = this.name;
     data['time'] = this.time;
-    data['status'] = this.status;
     return data;
   }
 

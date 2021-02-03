@@ -115,9 +115,8 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
                                         : null,
                                     name: _editingController.text,
 
-                                    status: 0,
                                     );
-                                widget._localPrayer == null
+                               /* widget._localPrayer == null
                                     ? value.addPrayer(prayer).then((value) {
                                         widget.globalKey.currentState
                                             .showSnackBar(SnackBar(
@@ -131,7 +130,7 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
                                               duration: Duration(milliseconds: 800),
                                                 content:
                                                     Text("Prayer updated")));
-                                      });
+                                      });*/
                                   _editingController.clear();
                                 Navigator.of(context).pop();
                               })

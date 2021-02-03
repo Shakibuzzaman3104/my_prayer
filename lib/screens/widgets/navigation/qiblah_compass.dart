@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_qiblah/flutter_qiblah.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:my_prayer/responsive/sizeconfig.dart';
 import 'package:my_prayer/utils/color_constants.dart';
 
 class QiblahCompass extends StatefulWidget {
@@ -86,15 +87,15 @@ class _QiblahCompassState extends State<QiblahCompass> {
 }
 
 class QiblahCompassWidget extends StatelessWidget {
-  final _compassSvg = SvgPicture.asset(
-    'assets/img/compass_back.svg',
-    color: ColorConstants.ICON,
+  final _compassSvg = Image.asset(
+    'assets/img/compass_back.png',
+    height: SizeConfig.imageSizeMultiplier*90,
+    width: SizeConfig.imageSizeMultiplier*90,
   );
   final _needleSvg = SvgPicture.asset(
     'assets/img/compass_arrow.svg',
-    color: ColorConstants.SUBTITLE,
     fit: BoxFit.contain,
-    height: 300,
+    height: SizeConfig.imageSizeMultiplier*70,
     alignment: Alignment.center,
   );
 
