@@ -4,6 +4,7 @@ import 'package:my_prayer/screens/views/navigation.dart';
 import 'package:my_prayer/screens/views/reminders.dart';
 import 'package:my_prayer/screens/views/settings.dart';
 import 'package:my_prayer/screens/views/dashboard.dart';
+import 'package:my_prayer/screens/views/tasbih_history.dart';
 import 'package:my_prayer/utils/router_path_constants.dart';
 
 import 'screens/views/add_prayer.dart';
@@ -21,10 +22,12 @@ class PathRouter {
         return MaterialPageRoute(builder: (_) => Navigation());
       case RouterPathsConstants.REMINDER:
       // var post = settings.arguments as Post;
-        return MaterialPageRoute(builder: (_) => Reminders());
+        return MaterialPageRoute(builder: (_) => ViewReminders());
       case RouterPathsConstants.SETTINGS:
+        return MaterialPageRoute(builder: (_) => ViewTasbihHistory());
+      case RouterPathsConstants.TasbihHistory:
       // var post = settings.arguments as Post;
-        return MaterialPageRoute(builder: (_) => Settings());
+        return MaterialPageRoute(builder: (_) => ViewTasbihHistory());
       default:
         return MaterialPageRoute(
             builder: (_) => Scaffold(

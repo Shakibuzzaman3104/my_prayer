@@ -13,6 +13,8 @@ import 'package:my_prayer/model/Meta.dart';
 import 'package:my_prayer/model/Method.dart';
 import 'package:my_prayer/model/ModelLocalPrayerParent.dart';
 import 'package:my_prayer/model/ModelPrayer.dart';
+import 'package:my_prayer/model/ModelReminder.dart';
+import 'package:my_prayer/model/ModelTasbih.dart';
 import 'package:my_prayer/model/Params.dart';
 import 'package:my_prayer/model/Timings.dart';
 import 'package:my_prayer/utils/LocalDbConstants.dart';
@@ -45,6 +47,8 @@ class HiveDb {
   Box<Method> methodBox;
   Box<Params> paramsBox;
   Box<bool> alarms;
+  Box<ModelReminder> reminder;
+  Box<ModelTasbih> tasbih;
 
   Future init() async {
     var _directory = await getApplicationDocumentsDirectory();
@@ -66,12 +70,15 @@ class HiveDb {
       ..registerAdapter(ParamsAdapter())
       ..registerAdapter(LocalPrayerAdapter())
       ..registerAdapter(ModelLocalPrayerParentAdapter())
+      ..registerAdapter(ModelReminderAdapter())
+      ..registerAdapter(ModelTasbihAdapter())
       ..registerAdapter(TimingsAdapter());
   }
 
   Future openPrayerBox() async {
     prayerBox = await Hive.openBox(LocalDbConstants.PRAYER);
   }
+
   Future openDatumBox() async =>
       datumBox = await Hive.openBox(LocalDbConstants.DATUM);
 
@@ -114,12 +121,17 @@ class HiveDb {
   Future openLocalPrayerBox() async =>
       localPrayerBox = await Hive.openBox(LocalDbConstants.LOCAL_PRAYER);
 
-  Future openLocalPrayerParentBox() async =>
-      localPrayerParentBox = await Hive.openBox(LocalDbConstants.LOCAL_PRAYER_PARENT);
+  Future openLocalPrayerParentBox() async => localPrayerParentBox =
+      await Hive.openBox(LocalDbConstants.LOCAL_PRAYER_PARENT);
 
   Future openAlarmsBox() async =>
       alarms = await Hive.openBox(LocalDbConstants.ALARMS);
 
+  Future openReminderBox() async =>
+      reminder = await Hive.openBox(LocalDbConstants.REMINDER);
+
+  Future openTashbihBox() async =>
+      tasbih = await Hive.openBox(LocalDbConstants.TASBIH);
 
   close(String name) => Hive.box(name).close();
 }

@@ -6,13 +6,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:my_prayer/local_database/sharedpreferences.dart';
 import 'package:my_prayer/model/Date.dart';
-
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:my_prayer/model/LocalPrayer.dart';
 import 'package:my_prayer/model/ModelLocalPrayerParent.dart';
 import 'package:my_prayer/model/ModelPrayer.dart';
+import 'package:my_prayer/model/ModelReminder.dart';
 import 'package:my_prayer/repository/repository.dart';
 import 'package:my_prayer/server_setup/local_database.dart';
 
@@ -69,7 +71,35 @@ class ViewModelDashboard extends BaseViewModel {
       isolateName,
     );
     AndroidAlarmManager.initialize();
-    port.listen((_) async => {});
+
+
+    port.listen((pos) async {
+
+      //Reschedule Alarm for nextDay
+      await HiveDb.getInstance().openLocalPrayerParentBox();
+      ModelLocalPrayer prayer = HiveDb.getInstance()
+          .localPrayerParentBox
+          .getAt(DateTime.now().day)
+          .prayers[pos];
+
+      List<String> time = prayer.time.split(":");
+
+      var date = DateTime.now().add(Duration(days: 1));
+
+      var newDate = new DateTime(date.year, date.month, date.day,
+          int.parse(time[0]), int.parse(time[1]), 0);
+
+      await AndroidAlarmManager.oneShotAt(
+        newDate,
+        // Ensure we have a unique alarm ID.
+        pos,
+        callback,
+        alarmClock: true,
+        exact: true,
+        wakeup: true,
+        rescheduleOnReboot: true,
+      );
+    });
     this._repository = PrayerRepository();
     _prayers = ModelPrayer();
     _parentPrayer = ModelLocalPrayerParent();
@@ -185,19 +215,20 @@ class ViewModelDashboard extends BaseViewModel {
   }
 
   //Notification Block
-  Future addAlarm({int pos, int id, String name}) async {
-   /* List<String> time = _parentPrayer.prayers[pos].time.split(":");
+  Future addAlarm({int pos}) async {
+    List<String> time = _parentPrayer.prayers[pos].time.split(":");
     var date = DateTime.fromMillisecondsSinceEpoch(
         int.parse(_parentPrayer.date) * 1000);
 
     var newDate = new DateTime(date.year, date.month, date.day,
-        int.parse(time[0]), int.parse(time[1]), 0);*/
+        int.parse(time[0]), int.parse(time[1]), 0);
 
     await AndroidAlarmManager.oneShotAt(
-      DateTime.now().add(Duration(minutes: 1)),
+      newDate,
       // Ensure we have a unique alarm ID.
       pos,
       callback,
+      alarmClock: true,
       exact: true,
       wakeup: true,
       rescheduleOnReboot: true,
@@ -206,53 +237,60 @@ class ViewModelDashboard extends BaseViewModel {
             {
               await HiveDb.getInstance().openAlarmsBox(),
               await HiveDb.getInstance().alarms.putAt(pos, true),
-              _alarms[pos]=true,
-              notifyListeners(),
+              updateStatus(pos, true),
               debugPrint("$value")
             }
         });
-
-/*
-    await flutterLocalNotificationsPlugin.showDailyAtTime(
-        id,
-        '${prayers[pos].name} prayer',
-        "It's time for your prayer",
-        time,
-        platformChannelSpecifics);
-*/
-    //updateStatus(id, 1,name);
   }
 
-  static Future<void> callback() async {
-    print('Alarm fired!');
-
+  static Future<void> callback(int id) async {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         new FlutterLocalNotificationsPlugin();
-    var android = new AndroidInitializationSettings('@mipmap/ic_launcher');
+    var android = new AndroidInitializationSettings('ic_stat_access_alarms');
     var iOS = new IOSInitializationSettings();
     var initSettings = new InitializationSettings(android: android, iOS: iOS);
     flutterLocalNotificationsPlugin.initialize(initSettings,
         onSelectNotification: (pay) {
       return null;
     });
-    var androidPlatformChannelSpecifics =
-        AndroidNotificationDetails('0', 'Hello', 'Value is');
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '$id',
+      'Hello',
+      'Value is',
+      sound: RawResourceAndroidNotificationSound("azan"),
+      playSound: true,
+      priority: Priority.high,
+      importance: Importance.max,
+    );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
         iOS: iOSPlatformChannelSpecifics);
 
-    await flutterLocalNotificationsPlugin.show(
-        0, "Prayer", "It's your prayer time", platformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(id, "${await getPrayerName(id)}",
+        "It's time for your prayer", platformChannelSpecifics);
 
     // This will be null if we're running in the background.
     uiSendPort ??= IsolateNameServer.lookupPortByName(isolateName);
-    uiSendPort?.send(null);
+    uiSendPort?.send(id);
   }
 
-  Future removeNotification(int id, String name) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
-    // updateStatus(id, 0, name);
+  static Future<String> getPrayerName(int pos) async {
+    await Hive.initFlutter();
+    HiveDb.getInstance().init();
+    await HiveDb.getInstance().openLocalPrayerBox();
+    String name = HiveDb.getInstance().localPrayerBox.getAt(pos).name;
+    await HiveDb.getInstance().localPrayerBox.close();
+    return name;
+  }
+
+  Future removeAlarm(int pos, bool status) async {
+    await AndroidAlarmManager.cancel(pos).then((value) async {
+      await HiveDb.getInstance().openAlarmsBox();
+      await HiveDb.getInstance().alarms.putAt(pos, false);
+      debugPrint("$value");
+    });
+    updateStatus(pos, false);
   }
 
   @override
@@ -260,4 +298,10 @@ class ViewModelDashboard extends BaseViewModel {
     print('I have been disposed!!');
     super.dispose();
   }
+
+  void updateStatus(int pos, bool status) {
+    _alarms[pos] = status;
+    notifyListeners();
+  }
+
 }

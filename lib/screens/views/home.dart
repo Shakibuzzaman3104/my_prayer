@@ -5,6 +5,7 @@ import 'package:my_prayer/screens/views/navigation.dart';
 import 'package:my_prayer/screens/views/reminders.dart';
 import 'package:my_prayer/screens/views/settings.dart';
 import 'package:my_prayer/screens/views/dashboard.dart';
+import 'package:my_prayer/screens/views/tasbih.dart';
 import 'package:my_prayer/server_setup/api_client.dart';
 import 'package:my_prayer/utils/color_constants.dart';
 import 'package:my_prayer/utils/router_path_constants.dart';
@@ -20,7 +21,8 @@ class _HomeViewState extends State<HomeView> {
   static List _widgetOptions = [
     Dashboard(),
     Navigation(),
-    Reminders(),
+    ViewReminders(),
+    ViewTasbih(),
     Settings(),
   ];
 
@@ -68,6 +70,15 @@ class _HomeViewState extends State<HomeView> {
               ),
               BottomNavigationBarItem(
                 icon: SvgPicture.asset(
+                  "assets/img/tasbih.svg",
+                  height: SizeConfig.imageSizeMultiplier * 6,
+                  width: SizeConfig.imageSizeMultiplier * 6,
+                  color: home.position ==3 ? Theme.of(context).primaryColor: Theme.of(context).accentColor,
+                ),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
                   "assets/img/settings.svg",
                   height: SizeConfig.imageSizeMultiplier * 6,
                   width: SizeConfig.imageSizeMultiplier * 6,
@@ -81,7 +92,7 @@ class _HomeViewState extends State<HomeView> {
             unselectedItemColor: Colors.white.withAlpha(100),
             type: BottomNavigationBarType.fixed,
             onTap: (index) {
-              if (index > -1 && index < 3) {
+              if (index > -1 && index < 4) {
                 home.setPosition(index);
               } else
                 Navigator.of(context).pushNamed(RouterPathsConstants.SETTINGS);

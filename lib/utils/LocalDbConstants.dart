@@ -33,4 +33,8 @@ class LocalDbConstants{
 
   static String ALARMS="alarms";
 
+  static String REMINDER="reminder";
+
+  static String TASBIH="tasbih";
+
 }
