@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_prayer/local_database/sharedpreferences.dart';
 import 'package:my_prayer/model/ModelTasbih.dart';
 import 'package:my_prayer/server_setup/local_database.dart';
 import 'package:my_prayer/viewmodel/base_view_model.dart';
@@ -6,6 +7,7 @@ import 'package:my_prayer/viewmodel/base_view_model.dart';
 class ViewmodelTasbih extends BaseViewModel {
   List<ModelTasbih> _tasbihs = [];
   static ModelTasbih _modelTasbih;
+  MySharedPreferences sharedPreferences;
   ModelTasbih reference = ModelTasbih(
     index: 0,
     title: "Best Dua",
@@ -16,6 +18,7 @@ class ViewmodelTasbih extends BaseViewModel {
 
   ViewmodelTasbih() {
     _modelTasbih = reference;
+    sharedPreferences = MySharedPreferences.getInstance();
   }
 
   ModelTasbih get singleTasbih => _modelTasbih;
@@ -24,10 +27,10 @@ class ViewmodelTasbih extends BaseViewModel {
 
   Future fetchTasbih() async {
     await HiveDb.getInstance().openTashbihBox();
-    _tasbihs = HiveDb.getInstance().tasbih.values.toList();
-
+    _tasbihs = HiveDb.getInstance().tasbih.values.toList().reversed.toList();
     if (_tasbihs.isNotEmpty) {
-      _modelTasbih = _tasbihs.last;
+      int latsIndex = await sharedPreferences.getLatsTasbih();
+      _modelTasbih = _tasbihs[latsIndex];
     }
     await HiveDb.getInstance().tasbih.close();
 
@@ -36,7 +39,14 @@ class ViewmodelTasbih extends BaseViewModel {
 
   Future getSingleTasbih(int pos) async {
     await HiveDb.getInstance().openTashbihBox();
-    _modelTasbih = HiveDb.getInstance().tasbih.values.elementAt(pos);
+    await sharedPreferences.setLastTasbih(pos);
+    _modelTasbih = HiveDb.getInstance()
+        .tasbih
+        .values
+        .toList()
+        .reversed
+        .toList()
+        .elementAt(pos);
     await HiveDb.getInstance().tasbih.close();
     notifyListeners();
   }
@@ -60,21 +70,40 @@ class ViewmodelTasbih extends BaseViewModel {
     int length = HiveDb.getInstance().tasbih.values.length;
     tasbih.index = length;
     await HiveDb.getInstance().tasbih.add(tasbih);
+    await sharedPreferences.setLastTasbih(tasbih.index);
+    await HiveDb.getInstance().tasbih.close();
+    _modelTasbih = tasbih;
+    notifyListeners();
+  }
+
+  Future updateTasbih(ModelTasbih tasbih) async {
+    await HiveDb.getInstance().openTashbihBox();
+    await HiveDb.getInstance().tasbih.put(tasbih.index, tasbih);
+    if (tasbih.index == _modelTasbih.index) _modelTasbih = tasbih;
+    notifyListeners();
     await HiveDb.getInstance().tasbih.close();
   }
 
   Future removeTasbih({@required int pos}) async {
     await HiveDb.getInstance().openTashbihBox();
-    await HiveDb.getInstance().tasbih.deleteAt(pos);
-    if (HiveDb.getInstance().tasbih.isEmpty) _modelTasbih = reference;
+    HiveDb.getInstance().tasbih.values.toList().reversed.toList().removeAt(pos);
+    if(await sharedPreferences.getLatsTasbih() == pos)
+      {
+       await sharedPreferences.setLastTasbih(HiveDb.getInstance().tasbih.length);
+      }
+    if (HiveDb.getInstance().tasbih.isEmpty) {
+      await sharedPreferences.setLastTasbih(-1);
+      _modelTasbih = reference;
+    }
     await HiveDb.getInstance().tasbih.close();
     fetchTasbih();
   }
 
-  reset() {
+  reset() async{
     _modelTasbih.counter = 0;
+    await HiveDb.getInstance().openTashbihBox();
+    await HiveDb.getInstance().tasbih.putAt(_modelTasbih.index, _modelTasbih);
+    await HiveDb.getInstance().tasbih.clear();
     notifyListeners();
   }
-
-  void saveTasbih() {}
 }

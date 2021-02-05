@@ -15,6 +15,6 @@ class ModelTasbih{
   @HiveField(4)
   int index;
 
-  ModelTasbih({this.counter, this.title, this.recitation, this.max, this.index});
+  ModelTasbih({this.counter, this.title, this.recitation, this.max, this.index=-1});
 
 }

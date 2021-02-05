@@ -22,13 +22,14 @@ class ViewModelReminders extends BaseViewModel {
   MySharedPreferences sharedPreferences = MySharedPreferences.getInstance();
   static SendPort uiSendPort;
   List<ModelReminder> _reminders = [];
-  bool _isDark=false;
+  bool _isDark = false;
 
   List<bool> _apToggle = [false, true];
 
   //Getter
   List<bool> get apToggle => _apToggle;
-  bool get isDark =>_isDark;
+
+  bool get isDark => _isDark;
 
   List<ModelReminder> get reminders => _reminders;
 
@@ -50,30 +51,15 @@ class ViewModelReminders extends BaseViewModel {
     AndroidAlarmManager.initialize();
 
     port.listen((pos) async {
-      //Reschedule Alarm for nextDay
-      await HiveDb.getInstance().openLocalPrayerParentBox();
-      ModelLocalPrayer prayer = HiveDb.getInstance()
-          .localPrayerParentBox
-          .getAt(DateTime.now().day)
-          .prayers[pos];
-
-      List<String> time = prayer.time.split(":");
-
-      var date = DateTime.now().add(Duration(days: 1));
-
-      var newDate = new DateTime(date.year, date.month, date.day,
-          int.parse(time[0]), int.parse(time[1]), 0);
-
-      await AndroidAlarmManager.oneShotAt(
-        newDate,
-        // Ensure we have a unique alarm ID.
-        pos,
-        callback,
-        alarmClock: true,
-        exact: true,
-        wakeup: true,
-        rescheduleOnReboot: true,
-      );
+      debugPrint("Port status");
+      await HiveDb.getInstance().openReminderBox();
+      ModelReminder reminder = HiveDb.getInstance().reminder.getAt(pos - 5000);
+      debugPrint("Reminder Status: ${reminder.status}");
+      await AndroidAlarmManager.cancel(pos + 5000).then((value) async {
+        await HiveDb.getInstance().reminder.putAt(reminder.id, reminder);
+        debugPrint(
+            "${HiveDb.getInstance().reminder.getAt(reminder.id).status}");
+      });
     });
   }
 
@@ -97,7 +83,7 @@ class ViewModelReminders extends BaseViewModel {
       _apToggle[1] = false;
     }
 
-    _reminders = await HiveDb.getInstance().reminder.values.toList();
+    _reminders = HiveDb.getInstance().reminder.values.toList();
 
     await upcomingReminder();
     setBusy(false);
@@ -126,29 +112,43 @@ class ViewModelReminders extends BaseViewModel {
 
     DateTime date = DateTime.parse(modelReminder.dateTime);
 
+    int alarmId=0;
+
+    await HiveDb.getInstance().openAlarmsBox();
+    if (shouldUpdate) {
+      await HiveDb.getInstance()
+          .reminder
+          .putAt(modelReminder.id, modelReminder);
+
+    } else {
+      modelReminder.id = length;
+      await HiveDb.getInstance().reminder.add(modelReminder);
+    }
+
+    alarmId = modelReminder.id;
+
+    await fetchReminders();
+    await HiveDb.getInstance().reminder.close();
+
+
     await AndroidAlarmManager.oneShotAt(
       date,
       // Ensure we have a unique alarm ID.
-      length + 5000,
+      alarmId + 5000,
       callback,
       exact: true,
       wakeup: true,
       rescheduleOnReboot: true,
-    ).then((value) async {
-      if (value) {
-        await HiveDb.getInstance().openAlarmsBox();
-        if (shouldUpdate) {
-          await HiveDb.getInstance()
-              .reminder
-              .putAt(modelReminder.id, modelReminder);
-        } else {
-          modelReminder.id = length;
-          await HiveDb.getInstance().reminder.add(modelReminder);
-        }
-        await fetchReminders();
-        await HiveDb.getInstance().reminder.close();
-      }
+    ).then((value) async {});
+  }
+
+  Future removeAlarm(ModelReminder reminder, int pos) async {
+    await AndroidAlarmManager.cancel(pos + 5000).then((value) async {
+      await HiveDb.getInstance().openReminderBox();
+      await HiveDb.getInstance().reminder.putAt(reminder.id, reminder);
+      debugPrint("$value");
     });
+    await fetchReminders();
   }
 
   static Future<void> callback(int id) async {
@@ -165,7 +165,6 @@ class ViewModelReminders extends BaseViewModel {
       '$id',
       'Hello',
       'Value is',
-      sound: RawResourceAndroidNotificationSound("azan"),
       playSound: true,
       priority: Priority.high,
       importance: Importance.max,
@@ -175,25 +174,37 @@ class ViewModelReminders extends BaseViewModel {
         android: androidPlatformChannelSpecifics,
         iOS: iOSPlatformChannelSpecifics);
 
-    await flutterLocalNotificationsPlugin.show(id, "${await getPrayerName(id)}",
-        "It's time for your prayer", platformChannelSpecifics);
+
+    debugPrint("${id}");
+    ModelReminder rem = await getReminder(id);
+    await flutterLocalNotificationsPlugin.show(
+        id, "${rem.name}", "${rem.name}", platformChannelSpecifics);
+
+    await HiveDb.getInstance().openReminderBox();
+    ModelReminder reminder = HiveDb.getInstance().reminder.getAt(id - 5000);
+    reminder.status = false;
+
+    await AndroidAlarmManager.cancel(id + 5000).then((value) async {
+      await HiveDb.getInstance().reminder.putAt(reminder.id, reminder);
+      debugPrint("${HiveDb.getInstance().reminder.getAt(reminder.id).status}");
+    });
 
     // This will be null if we're running in the background.
     uiSendPort ??= IsolateNameServer.lookupPortByName(isolateName);
     uiSendPort?.send(id);
   }
 
-  static Future<String> getPrayerName(int pos) async {
+  static Future<ModelReminder> getReminder(int pos) async {
     await Hive.initFlutter();
     HiveDb.getInstance().init();
     await HiveDb.getInstance().openReminderBox();
-    String name = HiveDb.getInstance().reminder.getAt(pos - 5001).name;
+    ModelReminder reminder = HiveDb.getInstance().reminder.getAt(pos - 5000);
     await HiveDb.getInstance().reminder.close();
-    return name;
+    return reminder;
   }
 
-  Future removeAlarm(int pos) async {
-    await AndroidAlarmManager.cancel(pos).then((value) async {
+  Future removeItem(int pos) async {
+    await AndroidAlarmManager.cancel(pos + 5000).then((value) async {
       await HiveDb.getInstance().openReminderBox();
       await HiveDb.getInstance().reminder.deleteAt(pos);
       await HiveDb.getInstance().reminder.close();
@@ -207,5 +218,4 @@ class ViewModelReminders extends BaseViewModel {
     print('I have been disposed!!');
     super.dispose();
   }
-
 }

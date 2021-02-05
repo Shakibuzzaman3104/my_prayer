@@ -9,7 +9,6 @@ import 'package:my_prayer/utils/router_path_constants.dart';
 
 import 'screens/views/add_prayer.dart';
 
-
 class PathRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -18,23 +17,23 @@ class PathRouter {
       case RouterPathsConstants.DASHBOARD:
         return MaterialPageRoute(builder: (_) => Dashboard());
       case RouterPathsConstants.NAVIGATION:
-       // var post = settings.arguments as Post;
+        // var post = settings.arguments as Post;
         return MaterialPageRoute(builder: (_) => Navigation());
       case RouterPathsConstants.REMINDER:
-      // var post = settings.arguments as Post;
+        // var post = settings.arguments as Post;
         return MaterialPageRoute(builder: (_) => ViewReminders());
       case RouterPathsConstants.SETTINGS:
-        return MaterialPageRoute(builder: (_) => ViewTasbihHistory());
+        return MaterialPageRoute(builder: (_) => Settings());
       case RouterPathsConstants.TasbihHistory:
-      // var post = settings.arguments as Post;
         return MaterialPageRoute(builder: (_) => ViewTasbihHistory());
       default:
         return MaterialPageRoute(
-            builder: (_) => Scaffold(
-                  body: Center(
-                    child: Text('No route defined for ${settings.name}'),
-                  ),
-                ));
+          builder: (_) => Scaffold(
+            body: Center(
+              child: Text('No route defined for ${settings.name}'),
+            ),
+          ),
+        );
     }
   }
 }

@@ -19,7 +19,6 @@ class PrayerRepository {
 
   Future getPrayersFromServer() async {
     MySharedPreferences mySharedPreferences = MySharedPreferences.getInstance();
-    await mySharedPreferences.createPref();
 
     Response response;
 
@@ -31,19 +30,34 @@ class PrayerRepository {
     if (month != DateTime.now().month ||
         lastPosition.longitude != position.longitude ||
         lastPosition.latitude != position.latitude) {
-      await determinePosition().then((_) async {
-        int method = await mySharedPreferences.getMethod();
-        ApiClient apiClient = ApiClient.getInstance();
-        response = await apiClient.fetchData(
-            endPoint:
-                "latitude=${position.latitude}&longitude=${position.longitude}&method=$method&month=${position.timestamp.month}&year=${position.timestamp.year}");
-
-        await mySharedPreferences.setPreviousMonth(DateTime.now().month);
-        await insertIntoDb(ModelPrayer.fromJson(response.data));
-      });
+      response = await fetchAndInsertData(position);
     } else {
       response = null;
     }
+
+    return response;
+  }
+
+  Future fetchAndInsertData(Position position) async {
+    Response response;
+    MySharedPreferences mySharedPreferences = MySharedPreferences.getInstance();
+
+    int method = await mySharedPreferences.getMethod();
+    ApiClient apiClient = ApiClient.getInstance();
+    response = await apiClient.fetchData(
+        endPoint:
+        "latitude=${position.latitude}&longitude=${position.longitude}&method=$method&month=${position.timestamp.month}&year=${position.timestamp.year}");
+    await mySharedPreferences.setPreviousMonth(DateTime.now().month);
+    await insertIntoDb(ModelPrayer.fromJson(response.data));
+
+    final coordinates =
+    new Coordinates(position.latitude, position.longitude);
+    var addresses =
+    await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    var first = addresses.first;
+    await mySharedPreferences
+        .setAddress("${first.locality}, ${first.countryName}")
+        .then((value) => debugPrint("$value"));
 
     return response;
   }
@@ -92,7 +106,6 @@ class PrayerRepository {
           HiveList(HiveDb.getInstance().localPrayerBox);
 
       atby.addAll(localPrayer);
-
 
       await HiveDb.getInstance().localPrayerParentBox.add(
           ModelLocalPrayerParent(date: data.date.timestamp, prayers: atby));

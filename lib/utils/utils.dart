@@ -5,29 +5,35 @@ import 'package:geolocator/geolocator.dart';
 ///
 /// When the location services are not enabled or permissions
 /// are denied the `Future` will return an error.
-Future determinePosition() async {
+Future<PERMISSIONS> determinePermission() async {
   bool serviceEnabled;
   LocationPermission permission;
 
   serviceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!serviceEnabled) {
-    return Future.error('Location services are disabled.');
+    debugPrint("Disabled");
+    return PERMISSIONS.DISABLED;
   }
 
   permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.deniedForever) {
-    return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.');
+    debugPrint("Denied Forever");
+    return PERMISSIONS.PERMANENTLY_DENIED;
   }
 
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
     if (permission != LocationPermission.whileInUse &&
         permission != LocationPermission.always) {
-      return Future.error(
-          'Location permissions are denied (actual value: $permission).');
+      debugPrint("Denied");
+      return PERMISSIONS.DENIED;
+    } else {
+      debugPrint("Approved");
+      return PERMISSIONS.APPROVED;
     }
   }
+  else
+    return PERMISSIONS.APPROVED;
 }
 
 List<String> convertTimeToAP(String time) {
@@ -45,3 +51,10 @@ List<String> convertTimeToAP(String time) {
       " PM"
     ];
 }
+
+List<String> convertStringToDateTime(String date) {
+  return convertTimeToAP(
+      "${DateTime.parse(date).hour}:${DateTime.parse(date).minute}");
+}
+
+enum PERMISSIONS { DISABLED, DENIED, PERMANENTLY_DENIED, APPROVED }

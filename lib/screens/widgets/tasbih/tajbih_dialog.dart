@@ -9,13 +9,11 @@ Future showAddEditDialog(
     TextEditingController _max,
     Function onClick,
     {ModelTasbih tasbih}) {
-
-  if(tasbih!=null)
-    {
-      _title.text = tasbih.title;
-      _recitation.text = tasbih.recitation;
-      _max.text = tasbih.max.floor().toString();
-    }
+  if (tasbih != null) {
+    _title.text = tasbih.title;
+    _recitation.text = tasbih.recitation;
+    _max.text = tasbih.max.floor().toString();
+  }
 
   return showDialog(
     context: context,
@@ -32,7 +30,7 @@ Future showAddEditDialog(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                tasbih==null? "ADD TASBIH" :"EDIT TASHBIH",
+                tasbih == null ? "ADD TASBIH" : "EDIT TASHBIH",
                 style: TextStyle(
                     color: Theme.of(context).primaryColor,
                     fontWeight: FontWeight.bold,
@@ -109,16 +107,43 @@ Future showAddEditDialog(
                   if (_title.text.trim().isNotEmpty &&
                       _recitation.text.isNotEmpty &&
                       _max.text.trim().isNotEmpty) {
-                    onClick(ModelTasbih(
-                        title: _title.text,
-                        recitation: _recitation.text,
-                        max: double.parse(_max.text),
-                        counter: tasbih == null ? 0 : tasbih.counter));
+                    if (tasbih != null) {
+                      if (double.parse(_max.text) < tasbih.counter) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                "Max value can't be less than counter value"),
+                          ),
+                        );
+                      } else
+                        onClick(ModelTasbih(
+                            index: tasbih.index,
+                            title: _title.text,
+                            recitation: _recitation.text,
+                            max: double.parse(_max.text),
+                            counter: tasbih.counter));
+                    } else if (double.parse(_max.text) < 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Max value can't be negative"),
+                        ),
+                      );
+                    } else
+                      onClick(
+                        ModelTasbih(
+                            title: _title.text,
+                            recitation: _recitation.text,
+                            max: double.parse(_max.text),
+                            counter: 0),
+                      );
+                    _title.clear();
+                    _max.clear();
+                    _recitation.clear();
                     Navigator.of(context, rootNavigator: true).pop();
                   }
                 },
                 child: Text(
-                  tasbih==null? "Add":"Update",
+                  tasbih == null ? "Add" : "Update",
                   style: TextStyle(color: Theme.of(context).backgroundColor),
                 ),
                 color: Theme.of(context).primaryColor,

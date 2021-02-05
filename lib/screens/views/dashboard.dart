@@ -5,10 +5,10 @@ import 'package:my_prayer/responsive/sizeconfig.dart';
 import 'package:my_prayer/screens/widgets/home/widget_circular_icon.dart';
 import 'package:my_prayer/screens/widgets/home/prayer_list.dart';
 import 'package:my_prayer/screens/widgets/widget_time.dart';
-import 'package:my_prayer/utils/color_constants.dart';
 import 'package:my_prayer/viewmodel/language_provider.dart';
 import 'package:my_prayer/viewmodel/viewmodel_dashboard.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -122,7 +122,7 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                           title: Text(
-                            "Dhaka, Bangladesh",
+                            "${model.address}",
                             style: TextStyle(color: Theme
                                 .of(context)
                                 .primaryColor),
@@ -148,7 +148,7 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                           title: Text(
-                            "03 Jumail Awal 1440 H",
+                           "${model.date}",
                             style: TextStyle(color: Theme
                                 .of(context)
                                 .primaryColor),
@@ -204,6 +204,7 @@ class _DashboardState extends State<Dashboard> {
                   Expanded(
                     child: Container(
                       margin: EdgeInsets.only(top: SizeConfig.heightMultiplier),
+
                       child: WidgetPrayerList(
                         alarms: viewmodel.alarms,
                         isAmPm: viewmodel.isAmPmSelected,

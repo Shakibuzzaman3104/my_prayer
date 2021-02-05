@@ -18,10 +18,6 @@ class BaseViewModel extends ChangeNotifier {
     });
   }
 
-  BaseViewModel(){
-    debugPrint("BaseView Called");
-  }
-
   void setBusy(bool value) {
     _busy = value;
     notifyListeners();

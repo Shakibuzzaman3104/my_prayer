@@ -56,8 +56,8 @@ class MySharedPreferences {
     return await _sharedPreferences.setString("address", address);
   }
 
-  Future<int> getAddress() async {
-    return _sharedPreferences.getInt("address") ?? "No name";
+  Future<String> getAddress() async {
+    return _sharedPreferences.getString("address") ?? "No name";
   }
 
   Future<bool> setIsAP(bool ap) async {
@@ -74,6 +74,22 @@ class MySharedPreferences {
 
   Future<bool> getIsDark() async {
     return _sharedPreferences.getBool("theme") ?? false;
+  }
+
+  Future<bool> setLastTasbih(int tasbih) async {
+    return await _sharedPreferences.setInt("tasbih", tasbih);
+  }
+
+  Future<int> getLatsTasbih() async {
+    return _sharedPreferences.getInt("tasbih")??-1;
+  }
+
+  Future<bool> setIsCustomLocation(bool location) async {
+    return await _sharedPreferences.setBool("custom_location", location);
+  }
+
+  Future<bool> getIsCustomLocation() async {
+    return _sharedPreferences.getBool("custom_location")??false;
   }
 
 

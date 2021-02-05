@@ -2,6 +2,7 @@ import 'package:my_prayer/viewmodel/viewmodel_home.dart';
 import 'package:my_prayer/viewmodel/viewmodel_navigation.dart';
 import 'package:my_prayer/viewmodel/viewmodel_dashboard.dart';
 import 'package:my_prayer/viewmodel/viewmodel_reminders.dart';
+import 'package:my_prayer/viewmodel/viewmodel_settings.dart';
 import 'package:my_prayer/viewmodel/viewmodel_tasbih.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -19,6 +20,7 @@ List<SingleChildWidget> independentServices = [
   ChangeNotifierProvider<ViewModelDashboard>(create: (_) => ViewModelDashboard()),
   ChangeNotifierProvider<ViewModelReminders>(create: (_) => ViewModelReminders()),
   ChangeNotifierProvider<ViewmodelTasbih>(create: (_) => ViewmodelTasbih()),
+  ChangeNotifierProvider<ViewModelSettings>(create: (_) => ViewModelSettings()),
   ChangeNotifierProvider<ViewModelNavigation>(
       create: (_) => ViewModelNavigation()),
 ];

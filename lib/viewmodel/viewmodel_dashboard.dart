@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:my_prayer/local_database/sharedpreferences.dart';
 import 'package:my_prayer/model/Date.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:my_prayer/model/Hijri.dart';
 import 'package:my_prayer/model/LocalPrayer.dart';
 import 'package:my_prayer/model/ModelLocalPrayerParent.dart';
 import 'package:my_prayer/model/ModelPrayer.dart';
@@ -32,6 +33,8 @@ class ViewModelDashboard extends BaseViewModel {
   BuildContext context;
   MySharedPreferences sharedPreferences = MySharedPreferences.getInstance();
   static SendPort uiSendPort;
+  String _address = "";
+  String _date = "";
 
   List<bool> _apToggle = [false, true];
   List<bool> _alarms = [
@@ -53,6 +56,10 @@ class ViewModelDashboard extends BaseViewModel {
 
   ModelPrayer get prayers => _prayers;
 
+  String get address => _address;
+
+  String get date => _date;
+
   ModelLocalPrayerParent get parentPrayer => _parentPrayer;
 
   ModelLocalPrayer get upComingPrayer => _upComingPrayer;
@@ -60,7 +67,6 @@ class ViewModelDashboard extends BaseViewModel {
   bool get isAmPmSelected => _apToggle[0] ? true : false;
 
   void connectionChanged(dynamic hasConnection) {
-    print("Connection Changed");
     if (!isOnline) {}
     isOnline = !isOnline;
   }
@@ -72,9 +78,7 @@ class ViewModelDashboard extends BaseViewModel {
     );
     AndroidAlarmManager.initialize();
 
-
     port.listen((pos) async {
-
       //Reschedule Alarm for nextDay
       await HiveDb.getInstance().openLocalPrayerParentBox();
       ModelLocalPrayer prayer = HiveDb.getInstance()
@@ -144,6 +148,8 @@ class ViewModelDashboard extends BaseViewModel {
     await HiveDb.getInstance().openLocalPrayerBox();
     await HiveDb.getInstance().openAlarmsBox();
 
+    _address = await sharedPreferences.getAddress();
+
     bool ap = await sharedPreferences.getIsAP();
 
     if (ap) {
@@ -153,6 +159,9 @@ class ViewModelDashboard extends BaseViewModel {
 
     if (HiveDb.getInstance().prayerBox.isNotEmpty) {
       _prayers = HiveDb.getInstance().prayerBox.get(0);
+      int dd = DateTime.now().day - 1;
+      Hijri hj = _prayers.data[dd].date.hijri;
+      _date = "${hj.weekday.en}, ${hj.month.en}, ${hj.year}";
     }
     if (HiveDb.getInstance().localPrayerParentBox.isNotEmpty) {
       _parentPrayer = HiveDb.getInstance()
@@ -163,12 +172,12 @@ class ViewModelDashboard extends BaseViewModel {
         var date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
         return date.day == DateTime.now().day;
       });
-      debugPrint("ViewModel ${_parentPrayer.prayers.length}");
       /**/
 
       _alarms = HiveDb.getInstance().alarms.values.toList();
     } else
       debugPrint("Not Found");
+
     await upcomingPrayer();
     setBusy(false);
   }
@@ -195,14 +204,12 @@ class ViewModelDashboard extends BaseViewModel {
         continue;
       }
       if (time > finalTime) {
-        debugPrint("Found Prayer");
         isFound = true;
         _upComingPrayer = element;
         break;
       }
     }
     if (!isFound) {
-      debugPrint("Not Found");
       _upComingPrayer = HiveDb.getInstance()
           .localPrayerParentBox
           .get(DateTime.now().day)
@@ -220,7 +227,7 @@ class ViewModelDashboard extends BaseViewModel {
     var date = DateTime.fromMillisecondsSinceEpoch(
         int.parse(_parentPrayer.date) * 1000);
 
-    var newDate = new DateTime(date.year, date.month, date.day,
+    DateTime newDate = new DateTime(date.year, date.month, date.day,
         int.parse(time[0]), int.parse(time[1]), 0);
 
     await AndroidAlarmManager.oneShotAt(
@@ -303,5 +310,4 @@ class ViewModelDashboard extends BaseViewModel {
     _alarms[pos] = status;
     notifyListeners();
   }
-
 }

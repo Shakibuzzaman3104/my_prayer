@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_prayer/screens/widgets/tasbih/tajbih_list.dart';
 import 'package:my_prayer/viewmodel/theme_viewmodel.dart';
+import 'package:my_prayer/viewmodel/viewmodel_tasbih.dart';
 import 'package:provider/provider.dart';
 
 class ViewTasbihHistory extends StatefulWidget {
@@ -10,6 +11,13 @@ class ViewTasbihHistory extends StatefulWidget {
 
 class _ViewTasbihHistoryState extends State<ViewTasbihHistory> {
 
+  @override
+  void initState() {
+    ViewmodelTasbih model =
+    Provider.of<ViewmodelTasbih>(context, listen: false);
+    model.fetchTasbih();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

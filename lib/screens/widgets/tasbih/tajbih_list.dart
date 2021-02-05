@@ -19,9 +19,6 @@ class _WidgetTajbihListState extends State<WidgetTajbihList> {
   @override
   void initState() {
     super.initState();
-    ViewmodelTasbih model =
-        Provider.of<ViewmodelTasbih>(context, listen: false);
-    model.fetchTasbih();
     _title = TextEditingController();
     _recitation = TextEditingController();
     _max = TextEditingController();
@@ -78,6 +75,7 @@ class _WidgetTajbihListState extends State<WidgetTajbihList> {
                           height: SizeConfig.imageSizeMultiplier * 10,
                           width: SizeConfig.imageSizeMultiplier * 10,
                           child: CircularProgressIndicator(
+                            strokeWidth: 2,
                             backgroundColor: Theme.of(context).cardColor,
                             valueColor:
                                 AlwaysStoppedAnimation<Color>(Colors.green),
@@ -116,7 +114,7 @@ class _WidgetTajbihListState extends State<WidgetTajbihList> {
                         onPressed: () {
                           showAddEditDialog(context, _title, _recitation, _max,
                               (modelTasbih) {
-                            viewModel.addTasbih(modelTasbih);
+                            viewModel.updateTasbih(modelTasbih);
                           }, tasbih: viewModel.tasbihs[index]);
                         }),
                     IconButton(

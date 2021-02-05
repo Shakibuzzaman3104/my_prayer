@@ -13,11 +13,6 @@ import '../widget_time.dart';
 import 'WidgetBottomSheet.dart';
 
 class WidgetReminderList extends StatefulWidget {
-  final GlobalKey<ScaffoldState> globalKey;
-  final LanguageProvider provider;
-
-  WidgetReminderList({this.globalKey, @required this.provider});
-
   @override
   _WidgetReminderListState createState() => _WidgetReminderListState();
 }
@@ -38,31 +33,35 @@ class _WidgetReminderListState extends State<WidgetReminderList> {
       builder: (ctx, model, child) => Expanded(
         child: ListView.builder(
             key: UniqueKey(),
-            padding: EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
+            padding: EdgeInsets.only(left:SizeConfig.imageSizeMultiplier*5,right:SizeConfig.imageSizeMultiplier*5),
             itemBuilder: (con, position) {
               return Dismissible(
                 direction: DismissDirection.endToStart,
                 background: Container(
-                  padding: EdgeInsets.only(right: 12),
-                  color: Colors.red,
+                  margin: EdgeInsets.symmetric(vertical: SizeConfig.heightMultiplier),
+                   padding: EdgeInsets.only(right: 12),
+                  decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(SizeConfig.imageSizeMultiplier)
+                  ),
                   child: Align(
                     child: Icon(
                       Icons.delete,
-                      color: Theme.of(context).primaryColor,
-                      size: SizeConfig.imageSizeMultiplier,
+                      color: Theme.of(context).backgroundColor,
+                      size: SizeConfig.imageSizeMultiplier*7,
                     ),
                     alignment: Alignment.centerRight,
                   ),
                 ),
                 onDismissed: (direction) {
-                  model.removeAlarm(position).then((_) {});
+                  model.removeItem(position).then((_) {});
                 },
                 child: Container(
                   margin: EdgeInsets.symmetric(
                       vertical: SizeConfig.widthMultiplier * 2),
                   padding: EdgeInsets.only(
-                      left: SizeConfig.widthMultiplier * 4,
-                      right: SizeConfig.widthMultiplier * 4),
+                    left: SizeConfig.widthMultiplier * 4,
+                  ),
                   height: SizeConfig.heightMultiplier * 10,
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
@@ -92,13 +91,42 @@ class _WidgetReminderListState extends State<WidgetReminderList> {
                           ),
                         ],
                       ),
-                      WidgetBottomSheet(
-                        icon: Icon(
-                          Icons.edit,
-                          color: Theme.of(context).backgroundColor,
-                        ),
-                        modelReminder: model.reminders[position],
-                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: model.reminders[position].status
+                                ? Icon(
+                                    Icons.access_alarm,
+                                    size: SizeConfig.imageSizeMultiplier * 5,
+                                    color: Theme.of(context).primaryColor,
+                                  )
+                                : Icon(
+                                    Icons.alarm_off,
+                                    size: SizeConfig.imageSizeMultiplier * 5,
+                                    color: Theme.of(context).accentColor,
+                                  ),
+                            onPressed: () {
+                              if (model.reminders[position].status) {
+                                debugPrint("RemoveAlarm Called");
+                                model.reminders[position].status = !model.reminders[position].status;
+                                model.removeAlarm(
+                                    model.reminders[position], position);
+                              } else
+                                model.addAlarm(model.reminders[position],
+                                    shouldUpdate: true);
+                            },
+                          ),
+                          WidgetBottomSheet(
+                            icon: Icon(
+                              Icons.edit,
+                              size: SizeConfig.imageSizeMultiplier * 5,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            modelReminder: model.reminders[position],
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),

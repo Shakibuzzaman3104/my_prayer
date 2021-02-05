@@ -21,7 +21,8 @@ class ModelTasbihAdapter extends TypeAdapter<ModelTasbih> {
       title: fields[1] as String,
       recitation: fields[2] as String,
       max: fields[3] as double,
-    )..index = fields[4] as int;
+      index: fields[4] as int,
+    );
   }
 
   @override

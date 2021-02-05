@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 part 'ModelReminder.g.dart';
 
 @HiveType(typeId: 20, adapterName: 'ModelReminderAdapter')
-class ModelReminder extends HiveObject{
+class ModelReminder{
   @HiveField(0)
   int id;
   @HiveField(1)
