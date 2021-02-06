@@ -9,6 +9,7 @@ import 'package:my_prayer/provider_setup.dart';
 import 'package:my_prayer/responsive/sizeconfig.dart';
 import 'package:my_prayer/router.dart';
 import 'package:my_prayer/screens/views/home.dart';
+import 'package:my_prayer/screens/views/onboarding_view.dart';
 import 'package:my_prayer/server_setup/local_database.dart';
 import 'package:my_prayer/viewmodel/theme_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +23,7 @@ void main() async {
   var instance = MySharedPreferences.getInstance();
   await instance.createPref();
   bool darkModeOn = await instance.getIsDark();
+  bool isFirstBoot = await instance.getIsFirstBoot();
   await Hive.initFlutter();
   HiveDb.getInstance().init();
   LanguageProvider languageProvider = LanguageProvider();
@@ -31,7 +33,7 @@ void main() async {
       child: ChangeNotifierProvider<ThemeViewModel>(
         create: (_) => ThemeViewModel(darkModeOn ? darkTheme : lightTheme),
         child: MyApp(
-          languageProvider: languageProvider,
+          languageProvider: languageProvider,isFirstBoot:isFirstBoot
         ),
       ),
       providers: providers,
@@ -43,8 +45,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
   final LanguageProvider languageProvider;
+  final bool isFirstBoot;
 
-  MyApp({this.languageProvider});
+  MyApp({this.languageProvider,this.isFirstBoot});
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +93,7 @@ class MyApp extends StatelessWidget {
                             ? Brightness.light
                             : Brightness.dark, //navigation bar icons' color
                       ),
-                      child: HomeView(),
+                      child:isFirstBoot?OnBoardingPage():HomeView(),
                     );
                   }
                 ),

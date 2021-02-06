@@ -92,5 +92,13 @@ class MySharedPreferences {
     return _sharedPreferences.getBool("custom_location")??false;
   }
 
+  Future<bool> isFirstBoot(bool boot) async {
+    return await _sharedPreferences.setBool("boot", boot);
+  }
+
+  Future<bool> getIsFirstBoot() async {
+    return _sharedPreferences.getBool("boot")??true;
+  }
+
 
 }

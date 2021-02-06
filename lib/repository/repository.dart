@@ -44,9 +44,19 @@ class PrayerRepository {
 
     int method = await mySharedPreferences.getMethod();
     ApiClient apiClient = ApiClient.getInstance();
+
+    double lat = position.latitude;
+    double ln = position.longitude;
+
+    if(await mySharedPreferences.getIsCustomLocation())
+      {
+         lat = await mySharedPreferences.getLatitude();
+         ln = await mySharedPreferences.getLongitude();
+      }
+
     response = await apiClient.fetchData(
         endPoint:
-        "latitude=${position.latitude}&longitude=${position.longitude}&method=$method&month=${position.timestamp.month}&year=${position.timestamp.year}");
+        "latitude=$lat&longitude=$ln&method=$method&month=${position.timestamp.month}&year=${position.timestamp.year}");
     await mySharedPreferences.setPreviousMonth(DateTime.now().month);
     await insertIntoDb(ModelPrayer.fromJson(response.data));
 
@@ -70,6 +80,7 @@ class PrayerRepository {
 
     await HiveDb.getInstance().localPrayerParentBox.clear();
     await HiveDb.getInstance().prayerBox.clear();
+    await HiveDb.getInstance().alarms.clear();
     await HiveDb.getInstance().localPrayerBox.clear();
 
     int id = 0;
@@ -116,8 +127,11 @@ class PrayerRepository {
     }
 
     await HiveDb.getInstance().prayerBox.add(prayer);
+    
     await HiveDb.getInstance().prayerBox.close();
+    await HiveDb.getInstance().alarms.close();
     await HiveDb.getInstance().localPrayerBox.close();
+    await HiveDb.getInstance().localPrayerParentBox.close();
   }
 
   Future updatePrayer(ModelLocalPrayer modelPrayer) async {}

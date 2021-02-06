@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:my_prayer/model/ModelTasbih.dart';
 import 'package:my_prayer/responsive/sizeconfig.dart';
 import 'package:my_prayer/viewmodel/viewmodel_settings.dart';
@@ -13,6 +14,7 @@ Future showChangeServerDialog(
   return showDialog(
     context: context,
     builder: (context) => Dialog(
+      backgroundColor: Theme.of(context).backgroundColor,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
               Radius.circular(SizeConfig.imageSizeMultiplier))),
@@ -42,6 +44,7 @@ Future showChangeServerDialog(
                     fontWeight: FontWeight.w300),
                 decoration: InputDecoration(
                   hintText: "Ex: old trafford,manchester",
+                  hintStyle: TextStyle(color: Theme.of(context).primaryColor),
                   labelText: "enter location",
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(
@@ -71,32 +74,68 @@ Future showChangeServerDialog(
                 height: SizeConfig.heightMultiplier * 3,
               ),
               Container(
-                height: SizeConfig.heightMultiplier * 20,
-                child: ListView.builder(
-                    itemCount: viewmodel.addresses.length,
-                    itemBuilder: (BuildContext ctxt, int index) {
-                      return InkWell(
-                        onTap: (){
-                          debugPrint("${viewmodel.addresses[index].locality}");
-                        },
-                        child: ListTile(
-                          leading: Text(
-                              "${viewmodel.addresses[index].featureName}, ${viewmodel.addresses[index].countryName}"),
-                        ),
-                      );
-                    }),
+                height: SizeConfig.heightMultiplier * 15,
+                child: viewmodel.addresses == null
+                    ? Center(
+                        child: Text("Searched locations will appear here"),
+                      )
+                    : viewmodel.isFetchingData
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : viewmodel.addresses.length == 0
+                            ? Center(
+                                child: Text("No address matches your input"),
+                              )
+                            : ListView.builder(
+                                itemCount: viewmodel.addresses.length,
+                                itemBuilder: (BuildContext ctx, int index) {
+                                  return InkWell(
+                                    onTap: () {
+                                      onClick(viewmodel.addresses[index]);
+                                      viewmodel.resetAddress();
+                                    },
+                                    child: ListTile(
+                                      tileColor: Theme.of(context).cardColor,
+                                      leading: Text(
+                                        "${viewmodel.addresses[index].featureName}, ${viewmodel.addresses[index].countryName}",
+                                        style: TextStyle(
+                                            color:
+                                                Theme.of(context).primaryColor),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+              ),
+              Text(
+                "OR",
+                style: TextStyle(
+                    fontSize: SizeConfig.textMultiplier * 2,
+                    color: Theme.of(context).primaryColor),
               ),
               MaterialButton(
                 minWidth: SizeConfig.widthMultiplier * 100,
                 height: SizeConfig.heightMultiplier * 5,
                 onPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop();
+                  onClick(null);
+                  // Navigator.of(context, rootNavigator: true).pop();
                 },
-                child: Text(
-                  "Update",
-                  style: TextStyle(color: Colors.white),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.navigation_outlined,
+                      color: Theme.of(context).backgroundColor,
+                    ),
+                    Text(
+                      "Locate me",
+                      style:
+                          TextStyle(color: Theme.of(context).backgroundColor),
+                    ),
+                  ],
                 ),
-                color: Colors.black,
+                color: Theme.of(context).primaryColor,
               ),
             ],
           ),

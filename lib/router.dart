@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:my_prayer/screens/views/home.dart';
 import 'package:my_prayer/screens/views/navigation.dart';
 import 'package:my_prayer/screens/views/reminders.dart';
 import 'package:my_prayer/screens/views/settings.dart';
@@ -26,6 +27,8 @@ class PathRouter {
         return MaterialPageRoute(builder: (_) => Settings());
       case RouterPathsConstants.TasbihHistory:
         return MaterialPageRoute(builder: (_) => ViewTasbihHistory());
+      case RouterPathsConstants.HOME:
+        return MaterialPageRoute(builder: (_) => HomeView());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

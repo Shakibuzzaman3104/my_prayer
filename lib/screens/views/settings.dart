@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoder/model.dart';
 import 'package:my_prayer/responsive/sizeconfig.dart';
 import 'package:my_prayer/screens/widgets/settings/location_dialog.dart';
 import 'package:my_prayer/screens/widgets/settings_toogle.dart';
@@ -127,10 +128,45 @@ class _SettingsState extends State<Settings> {
                     ),
                     FlatButton(
                       onPressed: () {
-                        showChangeServerDialog(context,_nameController,settings,(){
-
+                        showChangeServerDialog(
+                            context, _nameController, settings,
+                            (Address address) async{
+                          if (address == null) {
+                            showFetchingDialog();
+                            await settings.changeLocation(address);
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          } else
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text("Are you sure"),
+                                content: Text(
+                                    "You will not get accurate information"),
+                                actions: [
+                                  FlatButton(
+                                    onPressed: () async {
+                                     showFetchingDialog();
+                                      await settings.changeLocation(address);
+                                      Navigator.of(context).pop();
+                                      _nameController.clear();
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text("Yes"),
+                                  ),
+                                  FlatButton(
+                                    onPressed: () {
+                                      _nameController.clear();
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text("No"),
+                                  ),
+                                ],
+                              ),
+                            );
                         });
-                      /*  ScaffoldMessenger.of(context).showSnackBar(
+                        /*  ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text("Coming soon..."),
                             duration: Duration(milliseconds: 900),
@@ -154,4 +190,16 @@ class _SettingsState extends State<Settings> {
       );
     });
   }
+  showFetchingDialog(){
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            content: Text(
+                "Fetching Data, please wait..."),
+          );
+        });
+  }
+
 }

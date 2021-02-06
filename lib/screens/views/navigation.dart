@@ -63,14 +63,18 @@ class _NavigationState extends State<Navigation> {
                 } else if (model.permission == PERMISSIONS.DENIED) {
                   return Center(
                     child: RaisedButton(
-                      onPressed: () {},
+                      onPressed: () {
+
+                      },
                       child: Text("Request Permission"),
                     ),
                   );
                 } else if (model.permission == PERMISSIONS.PERMANENTLY_DENIED) {
                   return Center(
                     child: RaisedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Geolocator.openAppSettings();
+                      },
                       child: Text("Open permission settings"),
                     ),
                   );

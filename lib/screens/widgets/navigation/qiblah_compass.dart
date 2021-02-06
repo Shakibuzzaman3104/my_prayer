@@ -40,14 +40,14 @@ class _QiblahCompassState extends State<QiblahCompass> {
       child:  StreamBuilder(
       stream: FlutterQiblah.qiblahStream,
       builder: (_, AsyncSnapshot<QiblahDirection> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting)
+        /*if (snapshot.connectionState == ConnectionState.waiting)
           return Container(
             child: Text(
               "Loading compass....",
               style: TextStyle(fontSize: SizeConfig.textMultiplier * 2),
             ),
           );
-
+*/
         final qiblahDirection = snapshot.data;
 
         return Column(
@@ -64,18 +64,18 @@ class _QiblahCompassState extends State<QiblahCompass> {
               alignment: Alignment.center,
               children: <Widget>[
                 Transform.rotate(
-                  angle: ((qiblahDirection.direction ?? 0) * (pi / 180) * -1),
+                  angle: qiblahDirection==null? 0: ((qiblahDirection.direction ?? 0) * (pi / 180) * -1),
                   child: _compassSvg,
                 ),
                 Transform.rotate(
-                  angle: ((qiblahDirection.qiblah ?? 0) * (pi / 180) * -1),
+                  angle:  qiblahDirection==null? 0: ((qiblahDirection.qiblah ?? 0) * (pi / 180) * -1),
                   alignment: Alignment.center,
                   child: _needleSvg,
                 ),
               ],
             ),
             Text(
-              "Direction: ${qiblahDirection.offset.toStringAsFixed(3)}°",
+              "Direction: ${qiblahDirection==null?0: qiblahDirection.offset.toStringAsFixed(3)}°",
               style: TextStyle(fontSize: SizeConfig.textMultiplier * 2,color: Theme.of(context).accentColor),
             ),
           ],

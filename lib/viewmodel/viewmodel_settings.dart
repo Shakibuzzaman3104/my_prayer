@@ -8,7 +8,8 @@ class ViewModelSettings extends BaseViewModel {
   MySharedPreferences sharedPreferences;
   PrayerRepository _repository;
   String _location;
-  List<Address> _addresses=[];
+  bool _isFetchingData = false;
+  List<Address> _addresses;
 
   List<String> _modes = [
     "Shia Ithna-Ansari",
@@ -27,18 +28,27 @@ class ViewModelSettings extends BaseViewModel {
     "Spiritual Administration of Muslims of Russia",
   ];
 
+  bool get isFetchingData => _isFetchingData;
 
-  fetchCoordinateFromName(String query)async{
-     _addresses = await Geocoder.local.findAddressesFromQuery(query);
-     notifyListeners();
+  fetchCoordinateFromName(String query) async {
+    _isFetchingData = true;
+    _addresses = await Geocoder.local.findAddressesFromQuery(query);
+    _isFetchingData = false;
+    notifyListeners();
   }
 
   List<String> get modes => _modes;
   int _position = 2;
 
   int get position => _position;
+
   String get location => _location;
+
   List<Address> get addresses => _addresses;
+
+  resetAddress() {
+    _addresses = [];
+  }
 
   ViewModelSettings() {
     _repository = PrayerRepository();
@@ -47,7 +57,7 @@ class ViewModelSettings extends BaseViewModel {
 
   Future fetchPosition() async {
     _position = await sharedPreferences.getMethod();
-    _location =  await sharedPreferences.getAddress();
+    _location = await sharedPreferences.getAddress();
     notifyListeners();
   }
 
@@ -55,11 +65,33 @@ class ViewModelSettings extends BaseViewModel {
     return _modes.indexOf(data);
   }
 
+  Future changeLocation(Address address) async {
+    await sharedPreferences.setIsCustomLocation(address==null?false:true);
+   Position pos;
+
+    if (address == null) {
+      pos = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.low);
+    } else {
+     pos = Position(
+          timestamp: DateTime.now(),
+          latitude: address.coordinates.latitude,
+          longitude: address.coordinates.longitude);
+     await sharedPreferences.setLatitude(address.coordinates.latitude);
+     await sharedPreferences.setLongitude(address.coordinates.longitude);
+    }
+
+    return await _repository.fetchAndInsertData(pos).then((value)async => await fetchPosition());
+  }
+
   Future changeMethod(String data) async {
     _position = getPositionFromString(data);
     await sharedPreferences.setMethod(_position);
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.low);
-   return await _repository.fetchAndInsertData(position).catchError((error){}).catchError((e){});
+    return await _repository
+        .fetchAndInsertData(position)
+        .catchError((error) {})
+        .catchError((e) {});
   }
 }

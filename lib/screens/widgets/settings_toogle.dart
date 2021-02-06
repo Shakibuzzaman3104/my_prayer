@@ -23,7 +23,7 @@ class WidgetSettingsToogle extends StatelessWidget {
               leading,
               style: TextStyle(
                   color: Theme.of(context).primaryColor,
-                  fontSize: SizeConfig.textMultiplier*2,
+                  fontSize: SizeConfig.textMultiplier * 2,
                   fontWeight: FontWeight.bold),
             ),
             Row(
@@ -44,7 +44,7 @@ class WidgetSettingsToogle extends StatelessWidget {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
         divider ? Divider() : Container(),

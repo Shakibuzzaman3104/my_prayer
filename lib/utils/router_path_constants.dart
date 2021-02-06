@@ -6,4 +6,5 @@ class RouterPathsConstants
   static const String REMINDER = "reminder";
   static const String SETTINGS = "settings";
   static const String TasbihHistory = "history";
+  static const String HOME = "home";
 }

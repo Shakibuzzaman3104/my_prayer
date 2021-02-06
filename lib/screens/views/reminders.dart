@@ -74,6 +74,7 @@ class _ViewRemindersState extends State<ViewReminders> {
                             "No Upcoming reminder",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
+                                color: Theme.of(context).primaryColor,
                                 fontSize: SizeConfig.textMultiplier * 2.5),
                           ),
                   ],

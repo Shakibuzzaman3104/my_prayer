@@ -7,17 +7,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive/hive.dart';
-import 'package:intl/intl.dart';
 import 'package:my_prayer/local_database/sharedpreferences.dart';
-import 'package:my_prayer/model/Date.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:my_prayer/model/Hijri.dart';
 import 'package:my_prayer/model/LocalPrayer.dart';
 import 'package:my_prayer/model/ModelLocalPrayerParent.dart';
 import 'package:my_prayer/model/ModelPrayer.dart';
-import 'package:my_prayer/model/ModelReminder.dart';
 import 'package:my_prayer/repository/repository.dart';
 import 'package:my_prayer/server_setup/local_database.dart';
+import 'package:my_prayer/utils/utils.dart';
 
 import 'package:my_prayer/viewmodel/base_view_model.dart';
 
@@ -35,6 +33,7 @@ class ViewModelDashboard extends BaseViewModel {
   static SendPort uiSendPort;
   String _address = "";
   String _date = "";
+  PERMISSIONS _permission = PERMISSIONS.APPROVED;
 
   List<bool> _apToggle = [false, true];
   List<bool> _alarms = [
@@ -51,6 +50,8 @@ class ViewModelDashboard extends BaseViewModel {
 
   //Getter
   List<bool> get apToggle => _apToggle;
+
+  PERMISSIONS get permission => _permission;
 
   List<bool> get alarms => _alarms;
 
