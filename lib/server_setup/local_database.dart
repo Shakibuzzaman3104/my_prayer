@@ -15,7 +15,6 @@ import 'package:my_prayer/model/ModelLocalPrayerParent.dart';
 import 'package:my_prayer/model/ModelPrayer.dart';
 import 'package:my_prayer/model/ModelReminder.dart';
 import 'package:my_prayer/model/ModelTasbih.dart';
-import 'package:my_prayer/model/Params.dart';
 import 'package:my_prayer/model/Timings.dart';
 import 'package:my_prayer/utils/LocalDbConstants.dart';
 import 'package:path_provider/path_provider.dart';
@@ -45,7 +44,6 @@ class HiveDb {
   Box<HijriWeekday> hijriWeekdayBox;
   Box<HijriMonth> hijriMonthBox;
   Box<Method> methodBox;
-  Box<Params> paramsBox;
   Box<bool> alarms;
   Box<ModelReminder> reminder;
   Box<ModelTasbih> tasbih;
@@ -67,7 +65,6 @@ class HiveDb {
       ..registerAdapter(HijriWeekdayAdapter())
       ..registerAdapter(MetaAdapter())
       ..registerAdapter(MethodAdapter())
-      ..registerAdapter(ParamsAdapter())
       ..registerAdapter(LocalPrayerAdapter())
       ..registerAdapter(ModelLocalPrayerParentAdapter())
       ..registerAdapter(ModelReminderAdapter())
@@ -109,8 +106,6 @@ class HiveDb {
   Future openMetaBox() async =>
       metaBox = await Hive.openBox(LocalDbConstants.META);
 
-  Future openParamsBox() async =>
-      paramsBox = await Hive.openBox(LocalDbConstants.PARAMS);
 
   Future openTimingsBox() async =>
       timingsBox = await Hive.openBox(LocalDbConstants.TIMINGS);

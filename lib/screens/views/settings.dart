@@ -94,7 +94,7 @@ class _SettingsState extends State<Settings> {
                             );
                           }).toList(),
                           onChanged: (String val) {
-                            settings.changeMethod(val);
+                            settings.changeMethodAndFetchData(val);
                           },
                         ),
                       ),
@@ -133,7 +133,7 @@ class _SettingsState extends State<Settings> {
                             (Address address) async{
                           if (address == null) {
                             showFetchingDialog();
-                            await settings.changeLocation(address);
+                            await settings.changeLocationAndFetchData(address);
                             Navigator.of(context).pop();
                             Navigator.of(context).pop();
                           } else
@@ -147,7 +147,7 @@ class _SettingsState extends State<Settings> {
                                   FlatButton(
                                     onPressed: () async {
                                      showFetchingDialog();
-                                      await settings.changeLocation(address);
+                                      await settings.changeLocationAndFetchData(address);
                                       Navigator.of(context).pop();
                                       _nameController.clear();
                                       Navigator.of(context).pop();

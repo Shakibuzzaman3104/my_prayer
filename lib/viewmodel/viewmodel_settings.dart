@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:my_prayer/local_database/sharedpreferences.dart';
@@ -13,7 +14,7 @@ class ViewModelSettings extends BaseViewModel {
   List<Address> _addresses;
   PERMISSIONS _permission = PERMISSIONS.APPROVED;
 
-  int _onBoradingPosition=0;
+  int _onBoradingPosition = 0;
 
   List<String> _modes = [
     "Shia Ithna-Ansari",
@@ -33,18 +34,19 @@ class ViewModelSettings extends BaseViewModel {
   ];
 
   bool get isFetchingData => _isFetchingData;
+
   int get onBoardingPosition => _onBoradingPosition;
 
   PERMISSIONS get permission => _permission;
 
-  changeOnBoardingPosition(int pos){
+  changeOnBoardingPosition(int pos) {
     _onBoradingPosition = pos;
     notifyListeners();
   }
 
-  Future changeFirstBoot() async
-  {
-   return await sharedPreferences.setIsFirstBoot(false);
+  Future changeFirstBoot() async {
+     await sharedPreferences.setIsFirstBoot(false);
+     return await fetchPrayers();
   }
 
   fetchCoordinateFromName(String query) async {
@@ -88,7 +90,7 @@ class ViewModelSettings extends BaseViewModel {
     return _modes.indexOf(data);
   }
 
-  Future changeLocation(Address address) async {
+  Future changeLocationAndFetchData(Address address) async {
     await sharedPreferences.setIsCustomLocation(address == null ? false : true);
     Position pos;
 
@@ -109,7 +111,15 @@ class ViewModelSettings extends BaseViewModel {
         .then((value) async => await fetchPosition());
   }
 
-  Future changeMethod(String data) async {
+  Future changeLocation(Address address) async {
+    await sharedPreferences.setIsCustomLocation(address == null ? false : true);
+    if (address != null) {
+      await sharedPreferences.setLatitude(address.coordinates.latitude);
+      await sharedPreferences.setLongitude(address.coordinates.longitude);
+    }
+  }
+
+  Future changeMethodAndFetchData(String data) async {
     _position = getPositionFromString(data);
     await sharedPreferences.setMethod(_position);
     Position position = await Geolocator.getCurrentPosition(
@@ -118,5 +128,29 @@ class ViewModelSettings extends BaseViewModel {
         .fetchAndInsertData(position)
         .catchError((error) {})
         .catchError((e) {});
+  }
+
+ Future fetchPrayers() async {
+    return await checkConnectionStatus().then((value) async {
+      await _repository
+          .getPrayersFromServer()
+          .then((response) {
+        if (response is DioError) {
+          print(response.message);
+        } else if (response == null) {
+          print("Already updated");
+        }
+      })
+          .catchError((error) async =>
+      {})
+          .catchError((e) {});
+    });
+    //await upcomingPrayer();
+  }
+
+  Future changeMethod(String data) async {
+    _position = getPositionFromString(data);
+    await sharedPreferences.setMethod(_position);
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
   }
 }

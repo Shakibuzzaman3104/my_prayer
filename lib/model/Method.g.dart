@@ -19,20 +19,17 @@ class MethodAdapter extends TypeAdapter<Method> {
     return Method(
       id: fields[0] as int,
       name: fields[1] as String,
-      params: fields[2] as Params,
     );
   }
 
   @override
   void write(BinaryWriter writer, Method obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(2)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.name)
-      ..writeByte(2)
-      ..write(obj.params);
+      ..write(obj.name);
   }
 
   @override

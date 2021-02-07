@@ -209,7 +209,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                 }).toList(),
                 onChanged: (String val) async {
                   await settings.changeMethod(val).then((value) => {
-                  introKey.currentState?.animateScroll(1)
+                  introKey.currentState?.animateScroll(3)
                   });
                 },
               ),
@@ -224,8 +224,15 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           ),
         ],
         onDone: () async {
+          showDialog(context: context,builder: (context){
+            return AlertDialog(
+              title: Text("Please wait"),
+              content: Text("Fetching prayer information from server"),
+            );
+          });
           await settings.changeFirstBoot();
-          Navigator.of(context).pushNamed(RouterPathsConstants.HOME);
+          Navigator.of(context).pop();
+          Navigator.of(context).pushNamedAndRemoveUntil(RouterPathsConstants.HOME, (Route<dynamic> route) => false);
         },
         //onSkip: () => _onIntroEnd(context), // You can override onSkip callback
         showSkipButton: settings.onBoardingPosition == 2 ? true : false,
@@ -235,9 +242,6 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         freeze: settings.onBoardingPosition == 0 ? true : false,
         onChange: (int pos) {
           settings.changeOnBoardingPosition(pos);
-          if (pos == 1 && settings.permission != PERMISSIONS.APPROVED) {
-            debugPrint("Denied");
-          }
         },
         skip: const Text('Skip'),
         next: const Icon(Icons.arrow_forward),

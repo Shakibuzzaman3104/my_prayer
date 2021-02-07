@@ -58,12 +58,12 @@ class ApiClient {
       );
       if (res.statusCode >= 200 && res.statusCode <= 250) {
         print("Transfer Succeed");
-        print(ModelPrayer.fromJson(res.data).data.length);
       } else {
         print(res);
         print("Else not successful");
       }
     } catch (e) {
+      debugPrint("MyError ${e.toString()}");
       res = e;
     }
 
