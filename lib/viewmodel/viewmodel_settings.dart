@@ -2,6 +2,7 @@ import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:my_prayer/local_database/sharedpreferences.dart';
 import 'package:my_prayer/repository/repository.dart';
+import 'package:my_prayer/utils/utils.dart';
 import 'package:my_prayer/viewmodel/base_view_model.dart';
 
 class ViewModelSettings extends BaseViewModel {
@@ -10,6 +11,9 @@ class ViewModelSettings extends BaseViewModel {
   String _location;
   bool _isFetchingData = false;
   List<Address> _addresses;
+  PERMISSIONS _permission = PERMISSIONS.APPROVED;
+
+  int _onBoradingPosition=0;
 
   List<String> _modes = [
     "Shia Ithna-Ansari",
@@ -29,12 +33,30 @@ class ViewModelSettings extends BaseViewModel {
   ];
 
   bool get isFetchingData => _isFetchingData;
+  int get onBoardingPosition => _onBoradingPosition;
+
+  PERMISSIONS get permission => _permission;
+
+  changeOnBoardingPosition(int pos){
+    _onBoradingPosition = pos;
+    notifyListeners();
+  }
+
+  Future changeFirstBoot() async
+  {
+   return await sharedPreferences.setIsFirstBoot(false);
+  }
 
   fetchCoordinateFromName(String query) async {
     _isFetchingData = true;
     _addresses = await Geocoder.local.findAddressesFromQuery(query);
     _isFetchingData = false;
     notifyListeners();
+  }
+
+  Future checkPermission() async {
+    _permission = await determinePermission();
+    setBusy(false);
   }
 
   List<String> get modes => _modes;
@@ -66,22 +88,24 @@ class ViewModelSettings extends BaseViewModel {
   }
 
   Future changeLocation(Address address) async {
-    await sharedPreferences.setIsCustomLocation(address==null?false:true);
-   Position pos;
+    await sharedPreferences.setIsCustomLocation(address == null ? false : true);
+    Position pos;
 
     if (address == null) {
       pos = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.low);
     } else {
-     pos = Position(
+      pos = Position(
           timestamp: DateTime.now(),
           latitude: address.coordinates.latitude,
           longitude: address.coordinates.longitude);
-     await sharedPreferences.setLatitude(address.coordinates.latitude);
-     await sharedPreferences.setLongitude(address.coordinates.longitude);
+      await sharedPreferences.setLatitude(address.coordinates.latitude);
+      await sharedPreferences.setLongitude(address.coordinates.longitude);
     }
 
-    return await _repository.fetchAndInsertData(pos).then((value)async => await fetchPosition());
+    return await _repository
+        .fetchAndInsertData(pos)
+        .then((value) async => await fetchPosition());
   }
 
   Future changeMethod(String data) async {
