@@ -22,7 +22,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   void initState() {
     _title = TextEditingController();
     ViewModelSettings settings =
-        Provider.of<ViewModelSettings>(context, listen: false);
+    Provider.of<ViewModelSettings>(context, listen: false);
     settings.fetchPosition();
     super.initState();
   }
@@ -58,6 +58,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
             image: _buildImage('location'),
             footer: MaterialButton(
               color: Colors.blue,
+              elevation: 0,
               child: Text(
                 "Grant permission",
                 style: TextStyle(color: Colors.white),
@@ -70,7 +71,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                       introKey.currentState?.animateScroll(2);
                       break;
                     default:
-                      introKey.currentState?.animateScroll(2);
+                      introKey.currentState?.animateScroll(1);
                       break;
                   }
                 });
@@ -78,108 +79,146 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
             ),
             decoration: pageDecoration,
           ),
-          settings.permission == PERMISSIONS.APPROVED
-              ? PageViewModel(title: "Hellow", body: "sdfgf")
-              : PageViewModel(
-                  title: "Enter manual location",
-                  bodyWidget: Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: SizeConfig.widthMultiplier * 4,
-                        vertical: SizeConfig.heightMultiplier * 2),
-                    height: SizeConfig.heightMultiplier * 50,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(height: SizeConfig.heightMultiplier),
-                        TextFormField(
-                          controller: _title,
-                          cursorColor: Theme.of(context).primaryColor,
-                          style: TextStyle(
-                              fontSize: SizeConfig.textMultiplier * 2,
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.w300),
-                          decoration: InputDecoration(
-                            hintText: "Ex: old trafford, Manchester",
-                            hintStyle: TextStyle(
-                                color: Theme.of(context).primaryColor),
-                            labelText: "enter location",
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ),
-                            labelStyle: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
+          PageViewModel(
+            title: "Enter manual location",
+            bodyWidget: Container(
+              padding: EdgeInsets.symmetric(
+                  horizontal: SizeConfig.widthMultiplier * 4,
+                  vertical: SizeConfig.heightMultiplier * 2),
+              height: SizeConfig.heightMultiplier * 50,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(height: SizeConfig.heightMultiplier),
+                  TextFormField(
+                    controller: _title,
+                    cursorColor: Theme
+                        .of(context)
+                        .primaryColor,
+                    style: TextStyle(
+                        fontSize: SizeConfig.textMultiplier * 2,
+                        color: Theme
+                            .of(context)
+                            .primaryColor,
+                        fontWeight: FontWeight.w300),
+                    decoration: InputDecoration(
+                      hintText: "Ex: old trafford, Manchester",
+                      hintStyle:
+                      TextStyle(color: Theme
+                          .of(context)
+                          .primaryColor),
+                      labelText: "enter location",
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Theme
+                              .of(context)
+                              .primaryColor,
                         ),
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: MaterialButton(
-                            onPressed: () async {
-                              if (_title.text.trim().isNotEmpty)
-                                await settings
-                                    .fetchCoordinateFromName(_title.text);
-                            },
-                            color: Colors.blueAccent,
-                            child: Text(
-                              "Search",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: SizeConfig.heightMultiplier * 3,
-                        ),
-                        Container(
-                          height: SizeConfig.heightMultiplier * 15,
-                          child: settings.addresses == null
-                              ? Center(
-                                  child: Text(
-                                      "Searched locations will appear here"),
-                                )
-                              : settings.isFetchingData
-                                  ? Center(
-                                      child: CircularProgressIndicator(),
-                                    )
-                                  : settings.addresses.length == 0
-                                      ? Center(
-                                          child: Text(
-                                              "No address matches your input"),
-                                        )
-                                      : ListView.builder(
-                                          itemCount: settings.addresses.length,
-                                          itemBuilder:
-                                              (BuildContext ctx, int index) {
-                                            return InkWell(
-                                              onTap: () {
-                                                settings.changeLocation(
-                                                    settings.addresses[index]);
-                                              },
-                                              child: ListTile(
-                                                tileColor:
-                                                    Theme.of(context).cardColor,
-                                                leading: Text(
-                                                  "${settings.addresses[index].featureName}, ${settings.addresses[index].countryName}",
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .primaryColor),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                        ),
-                      ],
+                      ),
+                      labelStyle: TextStyle(
+                        color: Theme
+                            .of(context)
+                            .primaryColor,
+                      ),
                     ),
                   ),
-                  image: _buildImage('location'),
-                  decoration: pageDecoration,
-                ),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: MaterialButton(
+                      onPressed: () async {
+                        if (_title.text
+                            .trim()
+                            .isNotEmpty)
+                          await settings.fetchCoordinateFromName(_title.text);
+                      },
+                      color: Colors.blueAccent,
+                      child: Text(
+                        "Search",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: SizeConfig.heightMultiplier * 3,
+                  ),
+                  Container(
+                    height: SizeConfig.heightMultiplier * 15,
+                    child: settings.addresses == null
+                        ? Center(
+                      child: Text("Searched locations will appear here"),
+                    )
+                        : settings.isFetchingData
+                        ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                        : settings.addresses.length == 0
+                        ? Center(
+                      child:
+                      Text("No address matches your input"),
+                    )
+                        : ListView.builder(
+                      itemCount: settings.addresses.length,
+                      itemBuilder: (BuildContext ctx, int index) {
+                        return InkWell(
+                          onTap: () {
+                            settings.changeLocation(
+                                settings.addresses[index]);
+                          },
+                          child: ListTile(
+                            tileColor:
+                            Theme
+                                .of(context)
+                                .cardColor,
+                            leading: Text(
+                              "${settings.addresses[index]
+                                  .featureName}, ${settings.addresses[index]
+                                  .countryName}",
+                              style: TextStyle(
+                                  color: Theme
+                                      .of(context)
+                                      .primaryColor),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            image: _buildImage('location'),
+            decoration: pageDecoration,
+          ),
+          PageViewModel(
+            image: _buildImage("mosque"),
+            title: "Choose your preferred institutions for prayer time",
+            bodyWidget: FittedBox(
+              child: DropdownButton<String>(
+                dropdownColor: Colors.white,
+                value: settings.modes[settings.position],
+                items: settings.modes.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: new Text(
+                      value,
+                      style: TextStyle(color: Theme
+                          .of(context)
+                          .primaryColor),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (String val) async {
+                  await settings.changeMethod(val).then((value) => {
+                  introKey.currentState?.animateScroll(1)
+                  });
+                },
+              ),
+            ),
+          ),
           PageViewModel(
             title: "Time is valuable",
             body:
-                "Imagine sleeping without praying Isha and waking up in your grave",
+            "Imagine sleeping without praying Isha and waking up in your grave",
             image: _buildImage('clock'),
             decoration: pageDecoration,
           ),
@@ -189,7 +228,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           Navigator.of(context).pushNamed(RouterPathsConstants.HOME);
         },
         //onSkip: () => _onIntroEnd(context), // You can override onSkip callback
-        showSkipButton: false,
+        showSkipButton: settings.onBoardingPosition == 2 ? true : false,
         showNextButton: settings.onBoardingPosition == 0 ? false : true,
         skipFlex: 0,
         nextFlex: 0,

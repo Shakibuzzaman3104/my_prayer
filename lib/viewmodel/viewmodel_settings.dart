@@ -57,6 +57,7 @@ class ViewModelSettings extends BaseViewModel {
   Future checkPermission() async {
     _permission = await determinePermission();
     setBusy(false);
+    return _permission;
   }
 
   List<String> get modes => _modes;
