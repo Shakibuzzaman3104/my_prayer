@@ -20,13 +20,8 @@ class _QiblahCompassState extends State<QiblahCompass> {
     super.initState();
   }
 
-  final _compassSvg = SvgPicture.asset(
-    'assets/img/compass_back.svg',
-    height: SizeConfig.imageSizeMultiplier * 90,
-    width: SizeConfig.imageSizeMultiplier * 90,
-  );
   final _needleSvg = SvgPicture.asset(
-    'assets/img/compass_arrow.svg',
+    'assets/img/compass_arrow_2.svg',
     fit: BoxFit.contain,
     height: SizeConfig.imageSizeMultiplier * 70,
     alignment: Alignment.center,
@@ -65,7 +60,12 @@ class _QiblahCompassState extends State<QiblahCompass> {
               children: <Widget>[
                 Transform.rotate(
                   angle: qiblahDirection==null? 0: ((qiblahDirection.direction ?? 0) * (pi / 180) * -1),
-                  child: _compassSvg,
+                  child:  SvgPicture.asset(
+                    'assets/img/compass_back.svg',
+                    color: Theme.of(context).primaryColor,
+                    height: SizeConfig.imageSizeMultiplier * 90,
+                    width: SizeConfig.imageSizeMultiplier * 90,
+                  ),
                 ),
                 Transform.rotate(
                   angle:  qiblahDirection==null? 0: ((qiblahDirection.qiblah ?? 0) * (pi / 180) * -1),

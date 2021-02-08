@@ -4,6 +4,8 @@ import 'package:geocoder/model.dart';
 import 'package:my_prayer/responsive/sizeconfig.dart';
 import 'package:my_prayer/screens/widgets/settings/location_dialog.dart';
 import 'package:my_prayer/screens/widgets/settings_toogle.dart';
+import 'package:my_prayer/screens/widgets/widget_location_settings_dialog.dart';
+import 'package:my_prayer/utils/utils.dart';
 import 'package:my_prayer/viewmodel/theme_viewmodel.dart';
 import 'package:my_prayer/viewmodel/viewmodel_settings.dart';
 import 'package:provider/provider.dart';
@@ -130,12 +132,31 @@ class _SettingsState extends State<Settings> {
                       onPressed: () {
                         showChangeServerDialog(
                             context, _nameController, settings,
-                            (Address address) async{
+                            (Address address) async {
                           if (address == null) {
-                            showFetchingDialog();
-                            await settings.changeLocationAndFetchData(address);
-                            Navigator.of(context).pop();
-                            Navigator.of(context).pop();
+                            await settings.checkPermission().then((permission)async {
+                              if (settings.permission ==
+                                      PERMISSIONS.PERMANENTLY_DENIED ||
+                                  settings.permission ==
+                                      PERMISSIONS.PERMANENTLY_DENIED) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return LocationSettingsDialog();
+                                    });
+                              } else if (settings.permission ==
+                                  PERMISSIONS.DISABLED) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => ShowSettingsDialog());
+                              } else {
+                                showFetchingDialog();
+                                await settings
+                                    .changeLocationAndFetchData(address);
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pop();
+                              }
+                            });
                           } else
                             showDialog(
                               context: context,
@@ -146,8 +167,9 @@ class _SettingsState extends State<Settings> {
                                 actions: [
                                   FlatButton(
                                     onPressed: () async {
-                                     showFetchingDialog();
-                                      await settings.changeLocationAndFetchData(address);
+                                      showFetchingDialog();
+                                      await settings
+                                          .changeLocationAndFetchData(address);
                                       Navigator.of(context).pop();
                                       _nameController.clear();
                                       Navigator.of(context).pop();
@@ -190,16 +212,15 @@ class _SettingsState extends State<Settings> {
       );
     });
   }
-  showFetchingDialog(){
+
+  showFetchingDialog() {
     return showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
-            content: Text(
-                "Fetching Data, please wait..."),
+            content: Text("Fetching Data, please wait..."),
           );
         });
   }
-
 }

@@ -18,6 +18,7 @@ Future showAddEditDialog(
   return showDialog(
     context: context,
     builder: (context) => Dialog(
+      backgroundColor: Theme.of(context).backgroundColor,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
               Radius.circular(SizeConfig.imageSizeMultiplier))),

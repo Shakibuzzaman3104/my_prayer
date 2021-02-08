@@ -36,7 +36,6 @@ class _ViewTasbihState extends State<ViewTasbih> {
       child: Consumer<ViewmodelTasbih>(builder: (context, viewModel, child) {
         return Scaffold(
           backgroundColor: Theme.of(context).backgroundColor,
-          resizeToAvoidBottomPadding: false,
           body: Container(
             padding: EdgeInsets.all(SizeConfig.imageSizeMultiplier * 3),
             child: Column(

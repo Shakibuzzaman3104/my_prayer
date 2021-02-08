@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:my_prayer/responsive/sizeconfig.dart';
-import 'package:my_prayer/screens/views/dashboard.dart';
+import 'package:my_prayer/screens/widgets/widget_location_settings_dialog.dart';
 import 'package:my_prayer/utils/router_path_constants.dart';
 import 'package:my_prayer/utils/utils.dart';
 import 'package:my_prayer/viewmodel/viewmodel_settings.dart';
@@ -70,9 +70,16 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                       await settings.changeLocation(null);
                       introKey.currentState?.animateScroll(2);
                       break;
-                    default:
+                    case PERMISSIONS.PERMANENTLY_DENIED:
                       introKey.currentState?.animateScroll(1);
                       break;
+                    case PERMISSIONS.DISABLED:
+                      showDialog(context: context,builder: (context){
+                        return LocationSettingsDialog();
+                      });
+                      break;
+                    case PERMISSIONS.DENIED:
+                      introKey.currentState?.animateScroll(1);
                   }
                 });
               },
@@ -85,7 +92,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
               padding: EdgeInsets.symmetric(
                   horizontal: SizeConfig.widthMultiplier * 4,
                   vertical: SizeConfig.heightMultiplier * 2),
-              height: SizeConfig.heightMultiplier * 50,
+              height: SizeConfig.heightMultiplier * 35,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -138,11 +145,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: SizeConfig.heightMultiplier * 3,
-                  ),
                   Container(
-                    height: SizeConfig.heightMultiplier * 15,
+                    height: SizeConfig.heightMultiplier * 10,
                     child: settings.addresses == null
                         ? Center(
                       child: Text("Searched locations will appear here"),
@@ -160,9 +164,9 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                       itemCount: settings.addresses.length,
                       itemBuilder: (BuildContext ctx, int index) {
                         return InkWell(
-                          onTap: () {
-                            settings.changeLocation(
-                                settings.addresses[index]);
+                          onTap: () async {
+                           await settings.changeLocation(
+                                settings.addresses[index]).then((value) => introKey.currentState?.animateScroll(2));
                           },
                           child: ListTile(
                             tileColor:
