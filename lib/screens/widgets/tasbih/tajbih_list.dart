@@ -33,112 +33,117 @@ class _WidgetTajbihListState extends State<WidgetTajbihList> {
               horizontal: SizeConfig.imageSizeMultiplier * 2),
           crossAxisCount: 4,
           itemCount: viewModel.tasbihs.length,
-          itemBuilder: (BuildContext context, int index) => new Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius:
-                  BorderRadius.circular(SizeConfig.imageSizeMultiplier * 2),
-            ),
-            padding: EdgeInsets.only(
-                left: SizeConfig.imageSizeMultiplier * 3,
-                right: SizeConfig.imageSizeMultiplier * 3,
-                top: SizeConfig.imageSizeMultiplier * 3),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          itemBuilder: (BuildContext context, int index) => Hero(
+            tag: "${viewModel.tasbihs[index].index}",
+            child:  Material(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius:
+                      BorderRadius.circular(SizeConfig.imageSizeMultiplier * 2),
+                ),
+                padding: EdgeInsets.only(
+                    left: SizeConfig.imageSizeMultiplier * 3,
+                    right: SizeConfig.imageSizeMultiplier * 3,
+                    top: SizeConfig.imageSizeMultiplier * 3),
+                child: Column(
                   children: [
-                    Text(
-                      "${viewModel.tasbihs[index].title}",
-                      style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontSize: SizeConfig.textMultiplier * 2,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Stack(
-                      alignment: Alignment.center,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          height: SizeConfig.imageSizeMultiplier * 8,
-                          width: SizeConfig.imageSizeMultiplier * 8,
-                          child: FittedBox(
-                            child: Text(
-                              "${viewModel.tasbihs[index].counter.floor()}/${viewModel.tasbihs[index].max.floor()}",
-                              style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: SizeConfig.textMultiplier * 1.3),
+                        Text(
+                          "${viewModel.tasbihs[index].title}",
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              fontSize: SizeConfig.textMultiplier * 2,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              height: SizeConfig.imageSizeMultiplier * 8,
+                              width: SizeConfig.imageSizeMultiplier * 8,
+                              child: FittedBox(
+                                child: Text(
+                                  "${viewModel.tasbihs[index].counter.floor()}/${viewModel.tasbihs[index].max.floor()}",
+                                  style: TextStyle(
+                                      color: Theme.of(context).primaryColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: SizeConfig.textMultiplier * 1.3),
+                                ),
+                              ),
                             ),
-                          ),
+                            Container(
+                              height: SizeConfig.imageSizeMultiplier * 10,
+                              width: SizeConfig.imageSizeMultiplier * 10,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                backgroundColor: Theme.of(context).cardColor,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.green),
+                                value: ((100) *
+                                        (viewModel.tasbihs[index].counter /
+                                            viewModel.tasbihs[index].max)) /
+                                    100,
+                              ),
+                            ),
+                          ],
                         ),
-                        Container(
-                          height: SizeConfig.imageSizeMultiplier * 10,
-                          width: SizeConfig.imageSizeMultiplier * 10,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            backgroundColor: Theme.of(context).cardColor,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.green),
-                            value: ((100) *
-                                    (viewModel.tasbihs[index].counter /
-                                        viewModel.tasbihs[index].max)) /
-                                100,
-                          ),
-                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: SizeConfig.heightMultiplier * 2,
+                    ),
+                    Text(
+                      "${viewModel.tasbihs[index].recitation}",
+                      maxLines: 10,
+                      style: TextStyle(
+                          color: Theme.of(context).accentColor,
+                          fontSize: SizeConfig.textMultiplier * 1.8),
+                    ),
+                    SizedBox(
+                      height: SizeConfig.heightMultiplier * 2,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                            icon: Icon(
+                              Icons.edit_outlined,
+                              color: Theme.of(context).accentColor,
+                            ),
+                            iconSize: SizeConfig.imageSizeMultiplier * 5,
+                            onPressed: () {
+                              showAddEditDialog(context, _title, _recitation, _max,
+                                  (modelTasbih) {
+                                viewModel.updateTasbih(modelTasbih);
+                              }, tasbih: viewModel.tasbihs[index]);
+                            }),
+                        IconButton(
+                            icon: Icon(
+                              Icons.open_in_new,
+                              color: Theme.of(context).accentColor,
+                            ),
+                            iconSize: SizeConfig.imageSizeMultiplier * 5,
+                            onPressed: () => {
+                                  viewModel.getSingleTasbih(index),
+                                  Navigator.pop(context),
+                                }),
+                        IconButton(
+                            icon: Icon(
+                              Icons.delete_outline,
+                              color: Theme.of(context).accentColor,
+                            ),
+                            iconSize: SizeConfig.imageSizeMultiplier * 5,
+                            onPressed: () {
+                              viewModel.removeTasbih(pos: index);
+                            }),
                       ],
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: SizeConfig.heightMultiplier * 2,
-                ),
-                Text(
-                  "${viewModel.tasbihs[index].recitation}",
-                  maxLines: 10,
-                  style: TextStyle(
-                      color: Theme.of(context).accentColor,
-                      fontSize: SizeConfig.textMultiplier * 1.8),
-                ),
-                SizedBox(
-                  height: SizeConfig.heightMultiplier * 2,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                        icon: Icon(
-                          Icons.edit_outlined,
-                          color: Theme.of(context).accentColor,
-                        ),
-                        iconSize: SizeConfig.imageSizeMultiplier * 5,
-                        onPressed: () {
-                          showAddEditDialog(context, _title, _recitation, _max,
-                              (modelTasbih) {
-                            viewModel.updateTasbih(modelTasbih);
-                          }, tasbih: viewModel.tasbihs[index]);
-                        }),
-                    IconButton(
-                        icon: Icon(
-                          Icons.open_in_new,
-                          color: Theme.of(context).accentColor,
-                        ),
-                        iconSize: SizeConfig.imageSizeMultiplier * 5,
-                        onPressed: () => {
-                              viewModel.getSingleTasbih(index),
-                              Navigator.pop(context),
-                            }),
-                    IconButton(
-                        icon: Icon(
-                          Icons.delete_outline,
-                          color: Theme.of(context).accentColor,
-                        ),
-                        iconSize: SizeConfig.imageSizeMultiplier * 5,
-                        onPressed: () {
-                          viewModel.removeTasbih(pos: index);
-                        }),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
           staggeredTileBuilder: (int index) => StaggeredTile.fit(2),

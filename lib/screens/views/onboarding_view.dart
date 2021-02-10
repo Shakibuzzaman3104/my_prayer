@@ -8,7 +8,6 @@ import 'package:my_prayer/utils/utils.dart';
 import 'package:my_prayer/viewmodel/viewmodel_settings.dart';
 import 'package:provider/provider.dart';
 
-import 'home.dart';
 
 class OnBoardingPage extends StatefulWidget {
   @override
@@ -32,7 +31,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   Widget _buildImage(String assetName) {
     return Align(
       child: SvgPicture.asset('assets/img/$assetName.svg',
-          width: SizeConfig.imageSizeMultiplier * 70),
+          width: SizeConfig.imageSizeMultiplier * 50),
       alignment: Alignment.bottomCenter,
     );
   }
@@ -54,7 +53,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         pages: [
           PageViewModel(
             title: "As-salamu alaykum\n ٱلسَّلَامُ عَلَيْكُمْ",
-            body: "App needs Location permission to access prayer information",
+            body: "This app collects location data to enable accurate prayer timing, accurate direction to qiblah using compass, even when the app is closed or not in use.",
             image: _buildImage('location'),
             footer: MaterialButton(
               color: Colors.blue,

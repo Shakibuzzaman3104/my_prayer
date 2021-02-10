@@ -27,7 +27,7 @@ class ViewmodelTasbih extends BaseViewModel {
 
   Future fetchTasbih() async {
     await HiveDb.getInstance().openTashbihBox();
-    _tasbihs = HiveDb.getInstance().tasbih.values.toList().reversed.toList();
+    _tasbihs = HiveDb.getInstance().tasbih.values.toList();
     if (_tasbihs.isNotEmpty) {
       int latsIndex = await sharedPreferences.getLatsTasbih();
       _modelTasbih = _tasbihs[latsIndex];
@@ -43,8 +43,6 @@ class ViewmodelTasbih extends BaseViewModel {
     _modelTasbih = HiveDb.getInstance()
         .tasbih
         .values
-        .toList()
-        .reversed
         .toList()
         .elementAt(pos);
     await HiveDb.getInstance().tasbih.close();
@@ -86,7 +84,7 @@ class ViewmodelTasbih extends BaseViewModel {
 
   Future removeTasbih({@required int pos}) async {
     await HiveDb.getInstance().openTashbihBox();
-    HiveDb.getInstance().tasbih.values.toList().reversed.toList().removeAt(pos);
+    HiveDb.getInstance().tasbih.values.toList().removeAt(pos);
     if(await sharedPreferences.getLatsTasbih() == pos)
       {
        await sharedPreferences.setLastTasbih(HiveDb.getInstance().tasbih.length);
