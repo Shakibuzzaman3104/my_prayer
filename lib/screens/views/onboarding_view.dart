@@ -53,7 +53,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         pages: [
           PageViewModel(
             title: "As-salamu alaykum\n ٱلسَّلَامُ عَلَيْكُمْ",
-            body: "This app collects location data to enable accurate prayer timing, accurate direction to qiblah using compass, even when the app is closed or not in use.",
+            body: "This app collects location data to enable accurate prayer timing, accurate direction to qiblah using compass",
             image: _buildImage('location'),
             footer: MaterialButton(
               color: Colors.blue,

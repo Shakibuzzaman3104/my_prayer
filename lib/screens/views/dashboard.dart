@@ -76,6 +76,12 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ],
                         ),
+                        StreamBuilder<String>(
+                          stream: model.countDownStream.stream,
+                          builder: (context, snapshot) {
+                            return Text("${snapshot.data}");
+                          }
+                        ),
                       ],
                     ),
                     Row(

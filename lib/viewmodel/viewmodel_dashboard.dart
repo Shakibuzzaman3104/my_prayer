@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:ffi';
 import 'dart:isolate';
 import 'dart:ui';
 
@@ -7,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:my_prayer/local_database/sharedpreferences.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:my_prayer/model/Hijri.dart';
@@ -16,6 +19,7 @@ import 'package:my_prayer/model/ModelPrayer.dart';
 import 'package:my_prayer/repository/repository.dart';
 import 'package:my_prayer/server_setup/local_database.dart';
 import 'package:my_prayer/utils/utils.dart';
+import 'package:rxdart/rxdart.dart';
 
 import 'package:my_prayer/viewmodel/base_view_model.dart';
 
@@ -35,6 +39,8 @@ class ViewModelDashboard extends BaseViewModel {
   String _date = "";
   PERMISSIONS _permission = PERMISSIONS.APPROVED;
 
+  final _countDownStream = StreamController<String>();
+
   List<bool> _apToggle = [false, true];
   List<bool> _alarms = [
     false,
@@ -47,6 +53,8 @@ class ViewModelDashboard extends BaseViewModel {
     false,
     false
   ];
+
+  StreamController<String> get countDownStream => _countDownStream;
 
   //Getter
   List<bool> get apToggle => _apToggle;
@@ -210,16 +218,60 @@ class ViewModelDashboard extends BaseViewModel {
         break;
       }
     }
+
+    var date = DateTime.now();
     if (!isFound) {
       _upComingPrayer = HiveDb.getInstance()
           .localPrayerParentBox
           .get(DateTime.now().day)
           .prayers[0];
+
+      date = date.add(Duration(days: 1));
     }
+
+    List<String> splits = _upComingPrayer.time.split(":");
+
+    countDownTimer(
+      DateTime(
+        date.year,
+        date.month,
+        date.day,
+        int.parse(splits[0]),
+        int.parse(splits[1],),0
+      ),
+    );
 
     HiveDb.getInstance().prayerBox.close();
     HiveDb.getInstance().localPrayerParentBox.close();
     HiveDb.getInstance().alarms.close();
+  }
+
+  countDownTimer(DateTime dateTime) {
+
+    DateTime localDate = DateTime.now();
+
+    Duration diff = dateTime.difference(localDate);
+
+
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      _countDownStream.add(printDuration(diff.inSeconds-timer.tick));
+    });
+  }
+
+  String printDuration(int sec) {
+    Duration duration = Duration(seconds: sec);
+
+    String twoDigits(int n) {
+      if (n >= 10) return "$n";
+      return "0$n";
+    }
+
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    if (duration.inHours > 0)
+      return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+    else
+      return "00:$twoDigitMinutes:$twoDigitSeconds";
   }
 
   //Notification Block
