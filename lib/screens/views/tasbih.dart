@@ -34,11 +34,12 @@ class _ViewTasbihState extends State<ViewTasbih> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Consumer<ViewmodelTasbih>(builder: (context, viewModel, child) {
-        return Scaffold(
-          backgroundColor: Theme.of(context).backgroundColor,
-          body: Hero(
-            tag: "${viewModel.singleTasbih.index}",
-            child: Material(
+        return Material(
+          color: Colors.transparent,
+          child: Scaffold(
+            backgroundColor: Theme.of(context).backgroundColor,
+            body: Hero(
+              tag: "${viewModel.singleTasbih.index}",
               child: Container(
                 padding: EdgeInsets.all(SizeConfig.imageSizeMultiplier * 3),
                 child: Column(
@@ -236,20 +237,20 @@ class _ViewTasbihState extends State<ViewTasbih> {
                 ),
               ),
             ),
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          floatingActionButton: FloatingActionButton(
-            backgroundColor: Theme.of(context).backgroundColor,
-            child: Icon(
-              Icons.add,
-              color: Theme.of(context).primaryColor,
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: Theme.of(context).backgroundColor,
+              child: Icon(
+                Icons.add,
+                color: Theme.of(context).primaryColor,
+              ),
+              onPressed: () {
+                showAddEditDialog(context, _title, _recitation, _max,
+                    (modelTasbih) {
+                  viewModel.addTasbih(modelTasbih);
+                });
+              },
             ),
-            onPressed: () {
-              showAddEditDialog(context, _title, _recitation, _max,
-                  (modelTasbih) {
-                viewModel.addTasbih(modelTasbih);
-              });
-            },
           ),
         );
       }),

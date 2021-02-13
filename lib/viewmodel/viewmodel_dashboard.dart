@@ -39,7 +39,7 @@ class ViewModelDashboard extends BaseViewModel {
   String _date = "";
   PERMISSIONS _permission = PERMISSIONS.APPROVED;
 
-  final _countDownStream = StreamController<String>();
+  final _countDownStream = StreamController<String>.broadcast();
 
   List<bool> _apToggle = [false, true];
   List<bool> _alarms = [
@@ -233,12 +233,14 @@ class ViewModelDashboard extends BaseViewModel {
 
     countDownTimer(
       DateTime(
-        date.year,
-        date.month,
-        date.day,
-        int.parse(splits[0]),
-        int.parse(splits[1],),0
-      ),
+          date.year,
+          date.month,
+          date.day,
+          int.parse(splits[0]),
+          int.parse(
+            splits[1],
+          ),
+          0),
     );
 
     HiveDb.getInstance().prayerBox.close();
@@ -247,14 +249,12 @@ class ViewModelDashboard extends BaseViewModel {
   }
 
   countDownTimer(DateTime dateTime) {
-
     DateTime localDate = DateTime.now();
 
     Duration diff = dateTime.difference(localDate);
 
-
     Timer.periodic(Duration(seconds: 1), (timer) {
-      _countDownStream.add(printDuration(diff.inSeconds-timer.tick));
+      _countDownStream.add(printDuration(diff.inSeconds - timer.tick));
     });
   }
 
@@ -282,6 +282,15 @@ class ViewModelDashboard extends BaseViewModel {
 
     DateTime newDate = new DateTime(date.year, date.month, date.day,
         int.parse(time[0]), int.parse(time[1]), 0);
+
+    var dateTime = DateTime.now();
+    if (date.isBefore(dateTime)) {
+      dateTime = dateTime.add(
+        Duration(days: 1),
+      );
+      newDate = new DateTime(dateTime.year, dateTime.month, dateTime.day,
+          int.parse(time[0]), int.parse(time[1]), 0);
+    }
 
     await AndroidAlarmManager.oneShotAt(
       newDate,

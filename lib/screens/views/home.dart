@@ -18,13 +18,21 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  static List _widgetOptions = [
+
+  PageController _pageController;
+
+  static List<Widget> _widgetOptions = [
     Dashboard(),
     Navigation(),
     ViewReminders(),
     ViewTasbih(),
-    Settings(),
   ];
+
+  @override
+  void initState() {
+    _pageController = PageController();
+    super.initState();
+  }
 
 
   @override
@@ -34,7 +42,14 @@ class _HomeViewState extends State<HomeView> {
         color: Theme.of(context).backgroundColor,
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          body: _widgetOptions[home.position],
+          body: PageView(
+            controller: _pageController,
+            children: _widgetOptions,
+            onPageChanged: (index){
+                home.setPosition(index);
+            },
+
+          ),
           bottomNavigationBar: BottomNavigationBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -94,6 +109,8 @@ class _HomeViewState extends State<HomeView> {
             onTap: (index) {
               if (index > -1 && index < 4) {
                 home.setPosition(index);
+                _pageController.animateToPage(index,
+                    duration: Duration(milliseconds: 500), curve: Curves.easeInOutCubic);
               } else
                 Navigator.of(context).pushNamed(RouterPathsConstants.SETTINGS);
               // try {

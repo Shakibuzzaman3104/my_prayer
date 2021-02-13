@@ -62,43 +62,62 @@ class _DashboardState extends State<Dashboard> {
                         Row(
                           children: [
                             Text(
-                              viewmodel.busy? "":viewmodel.upComingPrayer.name + ", ",
+                              viewmodel.busy
+                                  ? ""
+                                  : viewmodel.upComingPrayer.name + ", ",
                               style: TextStyle(
                                   fontSize: SizeConfig.textMultiplier * 2.5,
                                   color: Theme.of(context).primaryColor,
                                   fontWeight: FontWeight.bold),
                             ),
-                            viewmodel.busy? SizedBox():WidgetTime(
-                              isAP: viewmodel.isAmPmSelected,
-                              titleSize: SizeConfig.textMultiplier * 2.5,
-                              time: viewmodel.upComingPrayer.time,
-                              subTitleSize: SizeConfig.textMultiplier * 2,
-                            ),
+                            viewmodel.busy
+                                ? SizedBox()
+                                : WidgetTime(
+                                    isAP: viewmodel.isAmPmSelected,
+                                    titleSize: SizeConfig.textMultiplier * 2.5,
+                                    time: viewmodel.upComingPrayer.time,
+                                    subTitleSize: SizeConfig.textMultiplier * 2,
+                                  ),
                           ],
                         ),
                         StreamBuilder<String>(
-                          stream: model.countDownStream.stream,
-                          builder: (context, snapshot) {
-                            return Text("${snapshot.data}");
-                          }
-                        ),
+                            stream: model.countDownStream.stream,
+                            builder: (context, snapshot) {
+                              return snapshot.data == null
+                                  ? Text(
+                                      "00:00:00",
+                                      style: TextStyle(
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                    )
+                                  : Text(
+                                      "${snapshot.data}",
+                                      style: TextStyle(
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                    );
+                            }),
                       ],
                     ),
                     Row(
                       children: [
-                        viewmodel.busy? SizedBox(): appBarIcons(
-                            isAP: viewmodel.isAmPmSelected,
-                            icon: "assets/img/sunrise.svg",
-                            time: viewmodel.parentPrayer.prayers[1].time,
-                            context: context),
+                        viewmodel.busy
+                            ? SizedBox()
+                            : appBarIcons(
+                                isAP: viewmodel.isAmPmSelected,
+                                icon: "assets/img/sunrise.svg",
+                                time: viewmodel.parentPrayer.prayers[1].time,
+                                context: context),
                         SizedBox(
                           width: SizeConfig.widthMultiplier * 5,
                         ),
-                        viewmodel.busy? SizedBox(): appBarIcons(
-                            isAP: viewmodel.isAmPmSelected,
-                            icon: "assets/img/sunset.svg",
-                            time: viewmodel.parentPrayer.prayers[4].time,
-                            context: context),
+                        viewmodel.busy
+                            ? SizedBox()
+                            : appBarIcons(
+                                isAP: viewmodel.isAmPmSelected,
+                                icon: "assets/img/sunset.svg",
+                                time: viewmodel.parentPrayer.prayers[4].time,
+                                context: context),
                       ],
                     ),
                   ],

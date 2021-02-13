@@ -16,7 +16,7 @@ class WidgetCircularItem extends StatelessWidget {
       height: SizeConfig.imageSizeMultiplier*10,
         width: SizeConfig.imageSizeMultiplier*10,
         decoration: BoxDecoration(
-          color: ColorConstants.CARD,
+          color: Theme.of(context).cardColor,
           shape: BoxShape.circle
         ),
       child: icon,
