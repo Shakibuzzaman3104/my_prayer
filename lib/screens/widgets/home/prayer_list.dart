@@ -4,17 +4,17 @@ import 'package:flutter/painting.dart';
 import 'package:my_prayer/model/LocalPrayer.dart';
 import 'package:my_prayer/responsive/sizeconfig.dart';
 import 'package:my_prayer/screens/widgets/widget_time.dart';
+import 'package:my_prayer/viewmodel/viewmodel_alarm_toogle.dart';
+import 'package:provider/provider.dart';
 
 class WidgetPrayerList extends StatefulWidget {
   final List<ModelLocalPrayer> prayer;
-  final List<bool> alarms;
-  final Function onAlarmClick;
   final bool isAmPm;
+  final Function onAlarmClick;
 
   WidgetPrayerList(
       {@required this.prayer,
       @required this.onAlarmClick,
-      @required this.alarms,
       @required this.isAmPm});
 
   @override
@@ -25,6 +25,9 @@ class _WidgetPrayerListState extends State<WidgetPrayerList>
     with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
+
+    ViewModelAlarmToggle toogle = Provider.of<ViewModelAlarmToggle>(context,listen: false);
+    toogle.fetchAlarms();
     super.initState();
   }
 
@@ -81,22 +84,27 @@ class _WidgetPrayerListState extends State<WidgetPrayerList>
                       SizedBox(
                         width: SizeConfig.widthMultiplier * 3,
                       ),
-                      IconButton(
-                        icon: widget.alarms[position]
-                            ? Icon(
-                                Icons.access_alarm,
-                                size: SizeConfig.imageSizeMultiplier * 8,
-                                color: Theme.of(context).primaryColor,
-                              )
-                            : Icon(
-                                Icons.alarm_off,
-                                size: SizeConfig.imageSizeMultiplier * 8,
-                                color: Theme.of(context).accentColor,
-                              ),
-                        onPressed: (){
-                          widget.onAlarmClick(position);
-                        },
-                      ),
+                      Consumer<ViewModelAlarmToggle>(
+                          builder: (context, data, child) {
+                        return IconButton(
+                          icon: data.alarms[position]
+                              ? Icon(
+                                  Icons.access_alarm,
+                                  size: SizeConfig.imageSizeMultiplier * 8,
+                                  color: Theme.of(context).primaryColor,
+                                )
+                              : Icon(
+                                  Icons.alarm_off,
+                                  size: SizeConfig.imageSizeMultiplier * 8,
+                                  color: Theme.of(context).accentColor,
+                                ),
+                          onPressed: () {
+                            widget.onAlarmClick(
+                                position, data.alarms[position]);
+                            data.updateStatus(position, !data.alarms[position]);
+                          },
+                        );
+                      }),
                     ],
                   ),
                 ],

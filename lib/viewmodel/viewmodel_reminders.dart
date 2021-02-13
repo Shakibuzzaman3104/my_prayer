@@ -174,11 +174,9 @@ class ViewModelReminders extends BaseViewModel {
         android: androidPlatformChannelSpecifics,
         iOS: iOSPlatformChannelSpecifics);
 
-
-    debugPrint("${id}");
     ModelReminder rem = await getReminder(id);
     await flutterLocalNotificationsPlugin.show(
-        id, "${rem.name}", "${rem.name}", platformChannelSpecifics);
+        id, "Prayer Reminder", "${rem.name}", platformChannelSpecifics);
 
     await HiveDb.getInstance().openReminderBox();
     ModelReminder reminder = HiveDb.getInstance().reminder.getAt(id - 5000);

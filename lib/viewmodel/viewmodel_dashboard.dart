@@ -61,7 +61,7 @@ class ViewModelDashboard extends BaseViewModel {
 
   PERMISSIONS get permission => _permission;
 
-  List<bool> get alarms => _alarms;
+
 
   ModelPrayer get prayers => _prayers;
 
@@ -182,8 +182,6 @@ class ViewModelDashboard extends BaseViewModel {
         return date.day == DateTime.now().day;
       });
       /**/
-
-      _alarms = HiveDb.getInstance().alarms.values.toList();
     } else
       debugPrint("Not Found");
 
@@ -306,7 +304,6 @@ class ViewModelDashboard extends BaseViewModel {
             {
               await HiveDb.getInstance().openAlarmsBox(),
               await HiveDb.getInstance().alarms.putAt(pos, true),
-              updateStatus(pos, true),
               debugPrint("$value")
             }
         });
@@ -336,8 +333,8 @@ class ViewModelDashboard extends BaseViewModel {
         android: androidPlatformChannelSpecifics,
         iOS: iOSPlatformChannelSpecifics);
 
-    await flutterLocalNotificationsPlugin.show(id, "${await getPrayerName(id)}",
-        "It's time for your prayer", platformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(id, "Prayer Reminder",
+        "It's time for ${await getPrayerName(id)}", platformChannelSpecifics);
 
     // This will be null if we're running in the background.
     uiSendPort ??= IsolateNameServer.lookupPortByName(isolateName);
@@ -359,7 +356,6 @@ class ViewModelDashboard extends BaseViewModel {
       await HiveDb.getInstance().alarms.putAt(pos, false);
       debugPrint("$value");
     });
-    updateStatus(pos, false);
   }
 
   @override
@@ -368,8 +364,5 @@ class ViewModelDashboard extends BaseViewModel {
     super.dispose();
   }
 
-  void updateStatus(int pos, bool status) {
-    _alarms[pos] = status;
-    notifyListeners();
-  }
+
 }

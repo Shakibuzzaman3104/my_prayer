@@ -1,3 +1,4 @@
+import 'package:my_prayer/viewmodel/viewmodel_alarm_toogle.dart';
 import 'package:my_prayer/viewmodel/viewmodel_home.dart';
 import 'package:my_prayer/viewmodel/viewmodel_navigation.dart';
 import 'package:my_prayer/viewmodel/viewmodel_dashboard.dart';
@@ -21,6 +22,7 @@ List<SingleChildWidget> independentServices = [
   ChangeNotifierProvider<ViewModelReminders>(create: (_) => ViewModelReminders()),
   ChangeNotifierProvider<ViewmodelTasbih>(create: (_) => ViewmodelTasbih()),
   ChangeNotifierProvider<ViewModelSettings>(create: (_) => ViewModelSettings()),
+  ChangeNotifierProvider<ViewModelAlarmToggle>(create: (_) => ViewModelAlarmToggle()),
   ChangeNotifierProvider<ViewModelNavigation>(
       create: (_) => ViewModelNavigation()),
 ];

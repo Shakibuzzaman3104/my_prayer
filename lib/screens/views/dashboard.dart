@@ -209,11 +209,10 @@ class _DashboardState extends State<Dashboard> {
                           child: CircularProgressIndicator(),
                         )
                       : WidgetPrayerList(
-                          alarms: viewmodel.alarms,
                           isAmPm: viewmodel.isAmPmSelected,
                           prayer: viewmodel.parentPrayer.prayers,
-                          onAlarmClick: (int pos) {
-                            viewmodel.alarms[pos]
+                          onAlarmClick: (int pos, bool status) {
+                            status
                                 ? viewmodel.removeAlarm(pos, false)
                                 : viewmodel.addAlarm(pos: pos);
                           },

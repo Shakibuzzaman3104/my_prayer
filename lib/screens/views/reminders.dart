@@ -35,7 +35,10 @@ class _ViewRemindersState extends State<ViewReminders> {
                   top: SizeConfig.heightMultiplier * 4,
                   left: SizeConfig.widthMultiplier * 3),
               child: Container(
-                padding: EdgeInsets.only(left:SizeConfig.imageSizeMultiplier*5,right:SizeConfig.imageSizeMultiplier*5,top:SizeConfig.imageSizeMultiplier*5),
+                padding: EdgeInsets.only(
+                    left: SizeConfig.imageSizeMultiplier * 5,
+                    right: SizeConfig.imageSizeMultiplier * 5,
+                    top: SizeConfig.imageSizeMultiplier * 5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,9 +85,24 @@ class _ViewRemindersState extends State<ViewReminders> {
               ),
             ),
             SizedBox(
-              height: SizeConfig.imageSizeMultiplier*10,
+              height: SizeConfig.imageSizeMultiplier * 10,
             ),
-            model.busy ? CircularProgressIndicator() : WidgetReminderList(),
+            model.busy
+                ? CircularProgressIndicator()
+                : model.reminders.isNotEmpty
+                    ? WidgetReminderList()
+                    : Expanded(
+                      child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Tap",style: TextStyle(color: Theme.of(context).primaryColor,fontSize: SizeConfig.textMultiplier*2),),
+                              Icon(Icons.add,color: Theme.of(context).primaryColor,),
+                              Text("at bottom the right corner",style: TextStyle(color: Theme.of(context).primaryColor,fontSize: SizeConfig.textMultiplier*2))
+                            ],
+                          ),
+                        ),
+                    ),
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
