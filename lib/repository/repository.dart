@@ -59,7 +59,7 @@ class PrayerRepository {
     await mySharedPreferences.setPreviousMonth(DateTime.now().month);
     await insertIntoDb(ModelPrayer.fromJson(response.data));
 
-    final coordinates = new Coordinates(lat, ln);
+    final coordinates =  Coordinates(lat, ln);
     var addresses =
         await Geocoder.local.findAddressesFromCoordinates(coordinates);
     var first = addresses.first;

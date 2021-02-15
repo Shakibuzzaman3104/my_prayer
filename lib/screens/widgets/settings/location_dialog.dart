@@ -63,10 +63,10 @@ Future showChangeServerDialog(
                     if (_title.text.trim().isNotEmpty)
                       viewmodel.fetchCoordinateFromName(_title.text);
                   },
-                  color: Colors.blueAccent,
+                  color: Theme.of(context).primaryColor,
                   child: Text(
                     "Search",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).backgroundColor),
                   ),
                 ),
               ),
@@ -77,7 +77,7 @@ Future showChangeServerDialog(
                 height: SizeConfig.heightMultiplier * 15,
                 child: viewmodel.addresses == null
                     ? Center(
-                        child: Text("Searched locations will appear here"),
+                        child: Text("Searched locations will appear here",style: TextStyle(color: Theme.of(context).primaryColor),),
                       )
                     : viewmodel.isFetchingData
                         ? Center(
@@ -85,7 +85,7 @@ Future showChangeServerDialog(
                           )
                         : viewmodel.addresses.length == 0
                             ? Center(
-                                child: Text("No address matches your input"),
+                                child: Text("No address matches your input",style: TextStyle(color: Theme.of(context).primaryColor),),
                               )
                             : ListView.builder(
                                 itemCount: viewmodel.addresses.length,

@@ -9,7 +9,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive/hive.dart';
-import 'package:intl/intl.dart';
 import 'package:my_prayer/local_database/sharedpreferences.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:my_prayer/model/Hijri.dart';
@@ -19,7 +18,6 @@ import 'package:my_prayer/model/ModelPrayer.dart';
 import 'package:my_prayer/repository/repository.dart';
 import 'package:my_prayer/server_setup/local_database.dart';
 import 'package:my_prayer/utils/utils.dart';
-import 'package:rxdart/rxdart.dart';
 
 import 'package:my_prayer/viewmodel/base_view_model.dart';
 
@@ -42,17 +40,7 @@ class ViewModelDashboard extends BaseViewModel {
   final _countDownStream = StreamController<String>.broadcast();
 
   List<bool> _apToggle = [false, true];
-  List<bool> _alarms = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false
-  ];
+
 
   StreamController<String> get countDownStream => _countDownStream;
 
@@ -155,7 +143,6 @@ class ViewModelDashboard extends BaseViewModel {
     await HiveDb.getInstance().openPrayerBox();
     await HiveDb.getInstance().openLocalPrayerParentBox();
     await HiveDb.getInstance().openLocalPrayerBox();
-    await HiveDb.getInstance().openAlarmsBox();
 
     _address = await sharedPreferences.getAddress();
 
@@ -243,12 +230,10 @@ class ViewModelDashboard extends BaseViewModel {
 
     HiveDb.getInstance().prayerBox.close();
     HiveDb.getInstance().localPrayerParentBox.close();
-    HiveDb.getInstance().alarms.close();
   }
 
   countDownTimer(DateTime dateTime) {
     DateTime localDate = DateTime.now();
-
     Duration diff = dateTime.difference(localDate);
 
     Timer.periodic(Duration(seconds: 1), (timer) {
@@ -282,6 +267,7 @@ class ViewModelDashboard extends BaseViewModel {
         int.parse(time[0]), int.parse(time[1]), 0);
 
     var dateTime = DateTime.now();
+
     if (date.isBefore(dateTime)) {
       dateTime = dateTime.add(
         Duration(days: 1),
@@ -289,6 +275,8 @@ class ViewModelDashboard extends BaseViewModel {
       newDate = new DateTime(dateTime.year, dateTime.month, dateTime.day,
           int.parse(time[0]), int.parse(time[1]), 0);
     }
+
+
 
     await AndroidAlarmManager.oneShotAt(
       newDate,
@@ -304,7 +292,7 @@ class ViewModelDashboard extends BaseViewModel {
             {
               await HiveDb.getInstance().openAlarmsBox(),
               await HiveDb.getInstance().alarms.putAt(pos, true),
-              debugPrint("$value")
+              debugPrint("Alarm Status $value")
             }
         });
   }
@@ -354,7 +342,7 @@ class ViewModelDashboard extends BaseViewModel {
     await AndroidAlarmManager.cancel(pos).then((value) async {
       await HiveDb.getInstance().openAlarmsBox();
       await HiveDb.getInstance().alarms.putAt(pos, false);
-      debugPrint("$value");
+      debugPrint("Removed status $value");
     });
   }
 

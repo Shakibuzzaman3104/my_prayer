@@ -8,7 +8,6 @@ import 'package:my_prayer/utils/utils.dart';
 import 'package:my_prayer/viewmodel/viewmodel_settings.dart';
 import 'package:provider/provider.dart';
 
-
 class OnBoardingPage extends StatefulWidget {
   @override
   _OnBoardingPageState createState() => _OnBoardingPageState();
@@ -21,7 +20,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   void initState() {
     _title = TextEditingController();
     ViewModelSettings settings =
-    Provider.of<ViewModelSettings>(context, listen: false);
+        Provider.of<ViewModelSettings>(context, listen: false);
     settings.fetchPosition();
     super.initState();
   }
@@ -53,7 +52,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         pages: [
           PageViewModel(
             title: "As-salamu alaykum\n ٱلسَّلَامُ عَلَيْكُمْ",
-            body: "This app collects location data to enable accurate prayer timing, accurate direction to qiblah using compass",
+            body:
+                "This app collects location data to enable accurate prayer timing, accurate direction to qiblah using compass",
             image: _buildImage('location'),
             footer: MaterialButton(
               color: Colors.blue,
@@ -73,9 +73,11 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                       introKey.currentState?.animateScroll(1);
                       break;
                     case PERMISSIONS.DISABLED:
-                      showDialog(context: context,builder: (context){
-                        return LocationSettingsDialog();
-                      });
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return LocationSettingsDialog();
+                          });
                       break;
                     case PERMISSIONS.DENIED:
                       introKey.currentState?.animateScroll(1);
@@ -98,33 +100,23 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                   SizedBox(height: SizeConfig.heightMultiplier),
                   TextFormField(
                     controller: _title,
-                    cursorColor: Theme
-                        .of(context)
-                        .primaryColor,
+                    cursorColor: Theme.of(context).primaryColor,
                     style: TextStyle(
                         fontSize: SizeConfig.textMultiplier * 2,
-                        color: Theme
-                            .of(context)
-                            .primaryColor,
+                        color: Theme.of(context).primaryColor,
                         fontWeight: FontWeight.w300),
                     decoration: InputDecoration(
                       hintText: "Ex: old trafford, Manchester",
                       hintStyle:
-                      TextStyle(color: Theme
-                          .of(context)
-                          .primaryColor),
+                          TextStyle(color: Colors.black),
                       labelText: "enter location",
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: Theme
-                              .of(context)
-                              .primaryColor,
+                          color: Colors.black,
                         ),
                       ),
                       labelStyle: TextStyle(
-                        color: Theme
-                            .of(context)
-                            .primaryColor,
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -132,9 +124,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                     alignment: Alignment.topLeft,
                     child: MaterialButton(
                       onPressed: () async {
-                        if (_title.text
-                            .trim()
-                            .isNotEmpty)
+                        if (_title.text.trim().isNotEmpty)
                           await settings.fetchCoordinateFromName(_title.text);
                       },
                       color: Colors.blueAccent,
@@ -148,43 +138,42 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                     height: SizeConfig.heightMultiplier * 10,
                     child: settings.addresses == null
                         ? Center(
-                      child: Text("Searched locations will appear here"),
-                    )
+                            child: Text("Searched locations will appear here"),
+                          )
                         : settings.isFetchingData
-                        ? Center(
-                      child: CircularProgressIndicator(),
-                    )
-                        : settings.addresses.length == 0
-                        ? Center(
-                      child:
-                      Text("No address matches your input"),
-                    )
-                        : ListView.builder(
-                      itemCount: settings.addresses.length,
-                      itemBuilder: (BuildContext ctx, int index) {
-                        return InkWell(
-                          onTap: () async {
-                           await settings.changeLocation(
-                                settings.addresses[index]).then((value) => introKey.currentState?.animateScroll(2));
-                          },
-                          child: ListTile(
-                            tileColor:
-                            Theme
-                                .of(context)
-                                .cardColor,
-                            leading: Text(
-                              "${settings.addresses[index]
-                                  .featureName}, ${settings.addresses[index]
-                                  .countryName}",
-                              style: TextStyle(
-                                  color: Theme
-                                      .of(context)
-                                      .primaryColor),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                            ? Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            : settings.addresses.length == 0
+                                ? Center(
+                                    child:
+                                        Text("No address matches your input"),
+                                  )
+                                : ListView.builder(
+                                    itemCount: settings.addresses.length,
+                                    itemBuilder: (BuildContext ctx, int index) {
+                                      return InkWell(
+                                        onTap: () async {
+                                          await settings
+                                              .changeLocation(
+                                                  settings.addresses[index])
+                                              .then((value) => introKey
+                                                  .currentState
+                                                  ?.animateScroll(2));
+                                        },
+                                        child: ListTile(
+                                          tileColor:
+                                              Theme.of(context).cardColor,
+                                          leading: Text(
+                                            "${settings.addresses[index].featureName}, ${settings.addresses[index].countryName}",
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                   ),
                 ],
               ),
@@ -204,16 +193,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                     value: value,
                     child: new Text(
                       value,
-                      style: TextStyle(color: Theme
-                          .of(context)
-                          .primaryColor),
+                      style: TextStyle(color: Colors.black),
                     ),
                   );
                 }).toList(),
                 onChanged: (String val) async {
-                  await settings.changeMethod(val).then((value) => {
-                  introKey.currentState?.animateScroll(3)
-                  });
+                  await settings.changeMethod(val).then(
+                      (value) => {introKey.currentState?.animateScroll(3)});
                 },
               ),
             ),
@@ -221,21 +207,37 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           PageViewModel(
             title: "Time is valuable",
             body:
-            "Imagine sleeping without praying Isha and waking up in your grave",
+                "Imagine sleeping without praying Isha and waking up in your grave",
             image: _buildImage('clock'),
             decoration: pageDecoration,
           ),
         ],
         onDone: () async {
-          showDialog(context: context,builder: (context){
-            return AlertDialog(
-              title: Text("Please wait"),
-              content: Text("Fetching prayer information from server"),
-            );
-          });
+          showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) {
+                return WillPopScope(
+                  onWillPop: () { },
+                  child: AlertDialog(
+                    title: Text("Please wait"),
+                    content: Container(
+                      height: SizeConfig.heightMultiplier * 6,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Fetching prayer information from server"),
+                          LinearProgressIndicator(),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              });
           await settings.changeFirstBoot();
           Navigator.of(context).pop();
-          Navigator.of(context).pushNamedAndRemoveUntil(RouterPathsConstants.HOME, (Route<dynamic> route) => false);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              RouterPathsConstants.HOME, (Route<dynamic> route) => false);
         },
         //onSkip: () => _onIntroEnd(context), // You can override onSkip callback
         showSkipButton: settings.onBoardingPosition == 2 ? true : false,

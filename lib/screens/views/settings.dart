@@ -83,7 +83,7 @@ class _SettingsState extends State<Settings> {
                       flex: 8,
                       child: FittedBox(
                         child: DropdownButton<String>(
-                          dropdownColor: Colors.white,
+                          dropdownColor: Theme.of(context).backgroundColor,
                           value: settings.modes[settings.position],
                           items: settings.modes.map((String value) {
                             return DropdownMenuItem<String>(

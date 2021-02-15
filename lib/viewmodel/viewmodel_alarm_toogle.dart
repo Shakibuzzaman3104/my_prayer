@@ -21,11 +21,13 @@ class ViewModelAlarmToggle extends ChangeNotifier{
   {
     await HiveDb.getInstance().openAlarmsBox();
     _alarms =  HiveDb.getInstance().alarms.values.toList();
+    debugPrint("$_alarms");
    await HiveDb.getInstance().alarms.close();
+    notifyListeners();
   }
 
 
-  void updateStatus(int pos, bool status) {
+  void updateStatus(int pos, bool status) async{
     _alarms[pos] = status;
     notifyListeners();
   }

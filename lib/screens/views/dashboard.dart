@@ -154,7 +154,7 @@ class _DashboardState extends State<Dashboard> {
                       leading: WidgetCircularItem(
                         icon: Icon(
                           Icons.date_range,
-                          color: Theme.of(context).accentColor,
+                          color: Theme.of(context).primaryColor,
                           size: SizeConfig.imageSizeMultiplier * 6,
                         ),
                       ),
