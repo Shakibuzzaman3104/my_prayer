@@ -292,7 +292,6 @@ class ViewModelDashboard extends BaseViewModel {
             {
               await HiveDb.getInstance().openAlarmsBox(),
               await HiveDb.getInstance().alarms.putAt(pos, true),
-              debugPrint("Alarm Status $value")
             }
         });
   }

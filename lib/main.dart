@@ -51,6 +51,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
     final themeViewModel = Provider.of<ThemeViewModel>(context);
     themeViewModel.getIsDark();
     return ChangeNotifierProvider<LanguageProvider>(
