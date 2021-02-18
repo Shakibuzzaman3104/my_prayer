@@ -80,8 +80,10 @@ class ViewModelDashboard extends BaseViewModel {
       await HiveDb.getInstance().openLocalPrayerParentBox();
       ModelLocalPrayer prayer = HiveDb.getInstance()
           .localPrayerParentBox
-          .getAt(DateTime.now().day)
+          .getAt(DateTime.now().add(Duration(days: 1)).day)
           .prayers[pos];
+
+      debugPrint("Rescheduled");
 
       List<String> time = prayer.time.split(":");
 

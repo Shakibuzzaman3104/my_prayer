@@ -98,7 +98,7 @@ class _ViewRemindersState extends State<ViewReminders> {
                             children: [
                               Text("Tap",style: TextStyle(color: Theme.of(context).primaryColor,fontSize: SizeConfig.textMultiplier*2),),
                               Icon(Icons.add,color: Theme.of(context).primaryColor,),
-                              Text("at bottom the right corner",style: TextStyle(color: Theme.of(context).primaryColor,fontSize: SizeConfig.textMultiplier*2))
+                              Text("at the bottom right corner",style: TextStyle(color: Theme.of(context).primaryColor,fontSize: SizeConfig.textMultiplier*2))
                             ],
                           ),
                         ),

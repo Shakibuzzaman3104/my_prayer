@@ -81,7 +81,7 @@ class MySharedPreferences {
   }
 
   Future<int> getLatsTasbih() async {
-    return _sharedPreferences.getInt("tasbih")??-1;
+    return _sharedPreferences.getInt("tasbih")??0;
   }
 
   Future<bool> setIsCustomLocation(bool location) async {

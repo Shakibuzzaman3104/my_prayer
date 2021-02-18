@@ -84,7 +84,7 @@ class ViewmodelTasbih extends BaseViewModel {
 
   Future removeTasbih({@required int pos}) async {
     await HiveDb.getInstance().openTashbihBox();
-    HiveDb.getInstance().tasbih.values.toList().removeAt(pos);
+    HiveDb.getInstance().tasbih.deleteAt(pos);
     if(await sharedPreferences.getLatsTasbih() == pos)
       {
        await sharedPreferences.setLastTasbih(HiveDb.getInstance().tasbih.length);
