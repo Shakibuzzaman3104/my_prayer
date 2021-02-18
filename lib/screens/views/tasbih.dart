@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
@@ -72,9 +73,10 @@ class _ViewTasbihState extends State<ViewTasbih> {
                                 color: Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(
                                     SizeConfig.imageSizeMultiplier * 3)),
-                            child: Text(
+                            child: AutoSizeText(
                               viewModel.singleTasbih.recitation,
                               textAlign: TextAlign.center,
+
                               style: TextStyle(
                                   color: Theme.of(context).primaryColor,
                                   fontWeight: FontWeight.bold,
